@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trading Engine - DebtManage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-8">
+          <a href="groww-mvp.html" class="text-2xl font-bold text-green-600">DebtManage</a>
+          <div class="hidden md:flex space-x-6">
+            <a href="dashboard.html" class="text-gray-600 hover:text-green-600">Dashboard</a>
+            <a href="trading.html" class="text-green-600 font-medium">Trading</a>
+            <a href="funds.html" class="text-gray-600 hover:text-green-600">Funds</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Trading Engine</h1>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- Buy/Sell Section -->
+      <div class="bg-white rounded-xl shadow-sm border p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Buy/Sell Mutual Funds</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fund Name</label>
+            <select id="fundName" class="w-full p-3 border rounded-lg">
+              <option value="SBI Bluechip Fund">SBI Bluechip Fund</option>
+              <option value="HDFC Mid Cap Fund">HDFC Mid Cap Fund</option>
+              <option value="Axis Small Cap Fund">Axis Small Cap Fund</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Transaction Type</label>
+            <div class="flex space-x-4">
+              <label class="flex items-center">
+                <input type="radio" name="transactionType" value="BUY" checked class="mr-2">
+                <span>Buy</span>
+              </label>
+              <label class="flex items-center">
+                <input type="radio" name="transactionType" value="SELL" class="mr-2">
+                <span>Sell</span>
+              </label>
+            </div>
+          </div>
+          
+          <div id="buySection">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Amount (₹)</label>
+              <input type="number" id="amount" placeholder="Enter amount" min="500" class="w-full p-3 border rounded-lg">
+            </div>
+            
+            <div class="flex items-center mt-4">
+              <input type="checkbox" id="isSIP" class="mr-2">
+              <label for="isSIP" class="text-sm text-gray-700">Set up as SIP</label>
+            </div>
+            
+            <div id="sipSection" class="hidden mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">SIP Date</label>
+              <select id="sipDate" class="w-full p-3 border rounded-lg">
+                <option value="1">1st of every month</option>
+                <option value="5">5th of every month</option>
+                <option value="10">10th of every month</option>
+                <option value="15">15th of every month</option>
+                <option value="20">20th of every month</option>
+                <option value="25">25th of every month</option>
+              </select>
+            </div>
+          </div>
+          
+          <div id="sellSection" class="hidden">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Units to Sell</label>
+              <input type="number" id="units" placeholder="Enter units" min="0.01" step="0.01" class="w-full p-3 border rounded-lg">
+            </div>
+          </div>
+          
+          <button onclick="executeTransaction()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+            Execute Transaction
+          </button>
+        </div>
+      </div>
+
+      <!-- Portfolio Section -->
+      <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-900">Portfolio</h2>
+          <button onclick="loadPortfolio()" class="text-green-600 hover:text-green-700 font-medium">Refresh</button>
+        </div>
+        
+        <div id="portfolioList" class="space-y-4">
+          <!-- Portfolio items will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Status Section -->
+    <div class="bg-white rounded-xl shadow-sm border p-6 mt-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Order Status</h2>
+      
+      <div class="flex space-x-4 mb-4">
+        <input type="text" id="orderIdInput" placeholder="Enter Order ID" class="flex-1 p-3 border rounded-lg">
+        <button onclick="checkOrderStatus()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          Check Status
+        </button>
+      </div>
+      
+      <div id="orderStatusResult" class="hidden p-4 bg-gray-50 rounded-lg">
+        <!-- Order status will be displayed here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle transaction type
+    document.querySelectorAll('input[name="transactionType"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'BUY') {
+          document.getElementById('buySection').classList.remove('hidden');
+          document.getElementById('sellSection').classList.add('hidden');
+        } else {
+          document.getElementById('buySection').classList.add('hidden');
+          document.getElementById('sellSection').classList.remove('hidden');
+        }
+      });
+    });
+
+    // Toggle SIP section
+    document.getElementById('isSIP').addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('sipSection').classList.remove('hidden');
+      } else {
+        document.getElementById('sipSection').classList.add('hidden');
+      }
+    });
+
+    async function executeTransaction() {
+      const transactionType = document.querySelector('input[name="transactionType"]:checked').value;
+      const fundName = document.getElementById('fundName').value;
+      
+      try {
+        let response;
+        
+        if (transactionType === 'BUY') {
+          const amount = parseFloat(document.getElementById('amount').value);
+          const isSIP = document.getElementById('isSIP').checked;
+          const sipDate = isSIP ? parseInt(document.getElementById('sipDate').value) : null;
+          
+          if (!amount || amount < 500) {
+            alert('Please enter a valid amount (minimum ₹500)');
+            return;
+          }
+          
+          response = await fetch('/buy-fund', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              fundName,
+              amount,
+              isSIP,
+              sipDate
+            })
+          });
+        } else {
+          const units = parseFloat(document.getElementById('units').value);
+          
+          if (!units || units <= 0) {
+            alert('Please enter valid units to sell');
+            return;
+          }
+          
+          response = await fetch('/sell-fund', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              fundName,
+              units
+            })
+          });
+        }
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert(`Transaction successful! Order ID: ${result.orderId}`);
+          document.getElementById('orderIdInput').value = result.orderId;
+          loadPortfolio();
+        } else {
+          alert(result.message || 'Transaction failed');
+        }
+        
+      } catch (error) {
+        alert('Error executing transaction');
+      }
+    }
+
+    async function loadPortfolio() {
+      try {
+        const response = await fetch('/portfolio', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          const portfolioList = document.getElementById('portfolioList');
+          portfolioList.innerHTML = '';
+          
+          if (result.portfolio.length === 0) {
+            portfolioList.innerHTML = '<p class="text-gray-500 text-center py-4">No investments yet</p>';
+            return;
+          }
+          
+          result.portfolio.forEach(item => {
+            const portfolioItem = document.createElement('div');
+            portfolioItem.className = 'p-4 border rounded-lg';
+            portfolioItem.innerHTML = `
+              <div class="flex justify-between items-center">
+                <div>
+                  <h4 class="font-medium text-gray-900">${item.fundName}</h4>
+                  <p class="text-sm text-gray-600">Units: ${item.totalUnits.toFixed(4)}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-medium text-gray-900">₹${item.currentValue.toFixed(2)}</p>
+                  <p class="text-sm text-gray-600">Invested: ₹${item.totalInvested.toFixed(2)}</p>
+                </div>
+              </div>
+            `;
+            portfolioList.appendChild(portfolioItem);
+          });
+        }
+        
+      } catch (error) {
+        console.error('Error loading portfolio:', error);
+      }
+    }
+
+    async function checkOrderStatus() {
+      const orderId = document.getElementById('orderIdInput').value;
+      
+      if (!orderId) {
+        alert('Please enter an Order ID');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/order-status/${orderId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          const statusDiv = document.getElementById('orderStatusResult');
+          statusDiv.classList.remove('hidden');
+          
+          const statusColor = {
+            'CREATED': 'text-blue-600',
+            'PROCESSING': 'text-yellow-600',
+            'SUCCESS': 'text-green-600',
+            'FAILED': 'text-red-600'
+          };
+          
+          statusDiv.innerHTML = `
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm text-gray-600">Order ID</p>
+                <p class="font-medium">${result.order.orderId}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Status</p>
+                <p class="font-medium ${statusColor[result.order.status]}">${result.order.status}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Type</p>
+                <p class="font-medium">${result.order.type}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Fund</p>
+                <p class="font-medium">${result.order.fundName}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Amount</p>
+                <p class="font-medium">₹${result.order.amount}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Units</p>
+                <p class="font-medium">${result.order.units?.toFixed(4) || 'N/A'}</p>
+              </div>
+            </div>
+          `;
+        } else {
+          alert(result.message || 'Order not found');
+        }
+        
+      } catch (error) {
+        alert('Error checking order status');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'groww-mvp.html';
+    }
+
+    // Initialize
+    loadPortfolio();
+  </script>
+</body>
+</html>

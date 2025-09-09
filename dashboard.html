@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard - DebtManage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-8">
+          <a href="index.html" class="text-2xl font-bold text-green-600">DebtManage</a>
+          <div class="hidden md:flex space-x-6">
+            <a href="dashboard.html" class="text-green-600 font-medium">Dashboard</a>
+            <a href="funds.html" class="text-gray-600 hover:text-green-600">Explore Funds</a>
+            <a href="sip-calculator.html" class="text-gray-600 hover:text-green-600">SIP Calculator</a>
+            <a href="transactions.html" class="text-gray-600 hover:text-green-600">Transactions</a>
+            <a href="education.html" class="text-gray-600 hover:text-green-600">Learn</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-600 hidden sm:block">Welcome, <span id="userName">User</span></span>
+          
+          <!-- Notifications -->
+          <div class="relative">
+            <button onclick="toggleNotifications()" class="p-2 rounded-lg hover:bg-gray-100 relative">
+              <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+              </svg>
+              <span id="notificationBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+            </button>
+            
+            <!-- Notification Dropdown -->
+            <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-80 w-screen max-w-sm bg-white rounded-lg shadow-lg border z-50">
+              <div class="p-4 border-b">
+                <h3 class="font-semibold text-gray-900">Notifications</h3>
+              </div>
+              <div id="notificationsList" class="max-h-64 overflow-y-auto">
+                <!-- Notifications will be populated here -->
+              </div>
+              <div class="p-3 border-t text-center">
+                <button onclick="clearAllNotifications()" class="text-sm text-gray-600 hover:text-gray-800">Clear All</button>
+              </div>
+            </div>
+          </div>
+          
+          <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors hidden md:block">
+            Logout
+          </button>
+          <!-- Mobile menu button -->
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile menu -->
+      <div id="mobileMenu" class="hidden md:hidden border-t border-gray-200">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+          <a href="dashboard.html" class="block px-3 py-2 text-green-600 font-medium rounded-md">Dashboard</a>
+          <a href="funds.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">Explore Funds</a>
+          <a href="sip-calculator.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">SIP Calculator</a>
+          <a href="transactions.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">Transactions</a>
+          <a href="education.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">Learn</a>
+          <button onclick="logout()" class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Portfolio Overview -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Investment Dashboard</h1>
+        <div class="text-sm text-gray-500">
+          Last updated: <span id="lastUpdated"></span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Portfolio Value</p>
+              <p id="portfolioValue" class="text-2xl font-bold text-gray-900">$0</p>
+            </div>
+            <div class="p-3 bg-green-100 rounded-full">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
+          </div>
+          <p id="portfolioReturn" class="text-sm text-green-600 mt-2">+0% overall returns</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Total Investment</p>
+              <p id="totalInvestment" class="text-2xl font-bold text-gray-900">$0</p>
+            </div>
+            <div class="p-3 bg-blue-100 rounded-full">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+            </div>
+          </div>
+          <p id="fundCount" class="text-sm text-gray-500 mt-2">Across 0 funds</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Active SIPs</p>
+              <p id="activeSIPs" class="text-2xl font-bold text-gray-900">0</p>
+            </div>
+            <div class="p-3 bg-purple-100 rounded-full">
+              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          </div>
+          <p id="monthlyAmount" class="text-sm text-gray-500 mt-2">$0/month</p>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-600">Total Returns</p>
+              <p id="totalReturns" class="text-2xl font-bold text-green-600">$0</p>
+            </div>
+            <div class="p-3 bg-green-100 rounded-full">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+              </svg>
+            </div>
+          </div>
+          <p id="xirr" class="text-sm text-green-600 mt-2">0% XIRR</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <div class="flex flex-wrap gap-4 lg:grid lg:grid-cols-4">
+        <button id="startSIPBtn" class="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 hover:scale-105 transition-all duration-200 text-center">
+          <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Start SIP
+        </button>
+        <button id="investNowBtn" class="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 hover:scale-105 transition-all duration-200 text-center">
+          <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          Invest Now
+        </button>
+        <button onclick="window.location.href='sip-calculator.html'" class="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 hover:scale-105 transition-all duration-200 text-center">
+          <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+          </svg>
+          SIP Calculator
+        </button>
+        <button onclick="window.location.href='transactions.html'" class="bg-orange-600 text-white p-4 rounded-lg hover:bg-orange-700 hover:scale-105 transition-all duration-200 text-center">
+          <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+          Transactions
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:grid lg:grid-cols-2 gap-8 mb-8">
+      <!-- Portfolio Performance Chart -->
+      <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-900">Portfolio Performance</h2>
+          <div class="flex space-x-2">
+            <button onclick="updateChart('6M')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-green-100 rounded transition-colors" id="btn-6M">6M</button>
+            <button onclick="updateChart('1Y')" class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded transition-colors" id="btn-1Y">1Y</button>
+            <button onclick="updateChart('2Y')" class="px-3 py-1 text-sm bg-gray-100 hover:bg-green-100 rounded transition-colors" id="btn-2Y">2Y</button>
+          </div>
+        </div>
+        <div class="h-80 relative">
+          <div id="portfolioChartLoader" class="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg">
+            <div class="animate-pulse space-y-4 w-full p-4">
+              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-32 bg-gray-200 rounded"></div>
+              <div class="flex space-x-4">
+                <div class="h-3 bg-gray-200 rounded flex-1"></div>
+                <div class="h-3 bg-gray-200 rounded flex-1"></div>
+                <div class="h-3 bg-gray-200 rounded flex-1"></div>
+              </div>
+            </div>
+          </div>
+          <canvas id="portfolioChart" class="hidden"></canvas>
+        </div>
+      </div>
+
+      <!-- My Portfolio -->
+      <div class="bg-white rounded-xl shadow-sm border p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">My Portfolio</h2>
+        
+        <!-- Asset Allocation Chart -->
+        <div class="mb-6">
+          <div class="h-64 flex items-center justify-center relative">
+            <div id="allocationChartLoader" class="absolute inset-0 flex items-center justify-center">
+              <div class="animate-pulse">
+                <div class="w-32 h-32 bg-gray-200 rounded-full"></div>
+              </div>
+            </div>
+            <canvas id="allocationChart" class="max-w-xs hidden"></canvas>
+          </div>
+        </div>
+        
+        <!-- Fund Breakdown -->
+        <div class="space-y-3">
+          <h3 class="text-sm font-medium text-gray-700 mb-3">Fund Holdings</h3>
+          <div id="fundHoldings">
+            <div class="text-center py-8 text-gray-500">
+              <p class="text-sm">No investments yet</p>
+              <p class="text-xs mt-1">Start investing to see your portfolio</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personalized Insights -->
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border p-6 mb-8">
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="p-2 bg-blue-100 rounded-full">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900">Personalized Insights</h2>
+      </div>
+      <div id="insightsList" class="space-y-3">
+        <!-- Insights will be populated here -->
+      </div>
+    </div>
+
+    <!-- Financial Goals -->
+    <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-900">Financial Goals</h2>
+        <button onclick="addNewGoal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">
+          + Add Goal
+        </button>
+      </div>
+      <div id="goalsList" class="space-y-4">
+        <!-- Goals will be populated here -->
+      </div>
+    </div>
+
+    <!-- Fund Comparison -->
+    <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="p-2 bg-orange-100 rounded-full">
+          <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900">Fund Comparison</h2>
+      </div>
+      
+      <div class="grid lg:grid-cols-2 gap-6">
+        <!-- Comparison Chart -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-medium text-gray-900">Performance Comparison</h3>
+            <select id="comparisonPeriod" onchange="updateComparison()" class="text-sm border rounded px-2 py-1">
+              <option value="1Y">1 Year</option>
+              <option value="3Y">3 Years</option>
+              <option value="5Y">5 Years</option>
+            </select>
+          </div>
+          <div class="h-64 relative">
+            <div id="comparisonChartLoader" class="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg">
+              <div class="animate-pulse space-y-3 w-full p-4">
+                <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                <div class="h-24 bg-gray-200 rounded"></div>
+                <div class="flex space-x-2">
+                  <div class="h-2 bg-blue-200 rounded w-8"></div>
+                  <div class="h-2 bg-green-200 rounded w-8"></div>
+                  <div class="h-2 bg-orange-200 rounded w-8"></div>
+                </div>
+              </div>
+            </div>
+            <canvas id="comparisonChart" class="hidden"></canvas>
+          </div>
+        </div>
+        
+        <!-- Fund Selection -->
+        <div>
+          <h3 class="font-medium text-gray-900 mb-4">Select Funds to Compare</h3>
+          <div class="space-y-3 mb-4">
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" id="fund1" checked class="text-blue-600">
+              <label for="fund1" class="text-sm">SBI Bluechip Fund</label>
+              <span class="text-xs text-blue-600">12.5%</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" id="fund2" checked class="text-green-600">
+              <label for="fund2" class="text-sm">HDFC Mid Cap Fund</label>
+              <span class="text-xs text-green-600">15.8%</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <input type="checkbox" id="benchmark" checked class="text-orange-600">
+              <label for="benchmark" class="text-sm">Nifty 50 (Benchmark)</label>
+              <span class="text-xs text-orange-600">11.2%</span>
+            </div>
+          </div>
+          
+          <!-- Performance Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-3 py-2 text-left">Fund</th>
+                  <th class="px-3 py-2 text-center">1Y</th>
+                  <th class="px-3 py-2 text-center">3Y</th>
+                  <th class="px-3 py-2 text-center">Risk</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                <tr>
+                  <td class="px-3 py-2 font-medium">SBI Bluechip</td>
+                  <td class="px-3 py-2 text-center text-blue-600">12.5%</td>
+                  <td class="px-3 py-2 text-center text-blue-600">14.2%</td>
+                  <td class="px-3 py-2 text-center"><span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Low</span></td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-medium">HDFC Mid Cap</td>
+                  <td class="px-3 py-2 text-center text-green-600">15.8%</td>
+                  <td class="px-3 py-2 text-center text-green-600">16.5%</td>
+                  <td class="px-3 py-2 text-center"><span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Med</span></td>
+                </tr>
+                <tr>
+                  <td class="px-3 py-2 font-medium">Nifty 50</td>
+                  <td class="px-3 py-2 text-center text-orange-600">11.2%</td>
+                  <td class="px-3 py-2 text-center text-orange-600">13.1%</td>
+                  <td class="px-3 py-2 text-center"><span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Benchmark</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Downloadable Reports -->
+    <div class="bg-white rounded-xl shadow-sm border p-6 mb-8">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="p-2 bg-green-100 rounded-full">
+          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900">Download Reports</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 border rounded-lg hover:shadow-md transition-shadow">
+          <div class="flex items-center space-x-3 mb-3">
+            <span class="text-2xl">📊</span>
+            <div>
+              <h4 class="font-medium text-gray-900">Portfolio Statement</h4>
+              <p class="text-sm text-gray-600">Current holdings & allocation</p>
+            </div>
+          </div>
+          <button onclick="downloadReport('portfolio')" class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-colors text-sm">
+            Download PDF
+          </button>
+        </div>
+        
+        <div class="p-4 border rounded-lg hover:shadow-md transition-shadow">
+          <div class="flex items-center space-x-3 mb-3">
+            <span class="text-2xl">📋</span>
+            <div>
+              <h4 class="font-medium text-gray-900">Transaction History</h4>
+              <p class="text-sm text-gray-600">All buy/sell transactions</p>
+            </div>
+          </div>
+          <button onclick="downloadReport('transactions')" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm">
+            Download PDF
+          </button>
+        </div>
+        
+        <div class="p-4 border rounded-lg hover:shadow-md transition-shadow">
+          <div class="flex items-center space-x-3 mb-3">
+            <span class="text-2xl">💰</span>
+            <div>
+              <h4 class="font-medium text-gray-900">Capital Gains</h4>
+              <p class="text-sm text-gray-600">Tax calculation report</p>
+            </div>
+          </div>
+          <button onclick="downloadReport('capital-gains')" class="w-full bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition-colors text-sm">
+            Download PDF
+          </button>
+        </div>
+      </div>
+      
+      <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+        <p class="text-sm text-gray-600">
+          <span class="font-medium">📅 Report Period:</span> 
+          <select id="reportPeriod" class="ml-2 text-sm border rounded px-2 py-1">
+            <option value="current-year">Current Financial Year</option>
+            <option value="last-year">Last Financial Year</option>
+            <option value="last-3-months">Last 3 Months</option>
+            <option value="custom">Custom Period</option>
+          </select>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- Active SIPs -->
+      <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">Active SIPs</h2>
+          <button class="text-green-600 hover:text-green-700 font-medium">View All</button>
+        </div>
+        <div id="activeSIPsList" class="space-y-4">
+          <!-- SIPs will be populated here -->
+        </div>
+      </div>
+
+      <!-- Upcoming Investments -->
+      <div class="bg-white rounded-xl shadow-sm border p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-900">Upcoming Investments</h2>
+          <button class="text-green-600 hover:text-green-700 font-medium">Manage</button>
+        </div>
+        <div id="upcomingInvestments" class="space-y-4">
+          <!-- Upcoming investments will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Portfolio data - empty for new users, populated for demo
+    let portfolioData = {
+      sips: [],
+      upcomingInvestments: []
+    };
+    
+    // Demo data for demo account
+    const demoPortfolioData = {
+      sips: [
+        {
+          name: 'SBI Bluechip Fund',
+          monthlyAmount: 500,
+          invested: 6000,
+          currentValue: 6750,
+          returns: 12.5,
+          nextDate: new Date(2024, 11, 15)
+        },
+        {
+          name: 'HDFC Mid Cap Fund',
+          monthlyAmount: 300,
+          invested: 3600,
+          currentValue: 4170,
+          returns: 15.8,
+          nextDate: new Date(2024, 11, 20)
+        }
+      ],
+      upcomingInvestments: [
+        {
+          name: 'Axis Small Cap Fund',
+          type: 'One-time Investment',
+          amount: 10000,
+          date: new Date(2024, 11, 25)
+        }
+      ]
+    };
+
+    function getNextSIPDate(day) {
+      const today = new Date();
+      const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, day);
+      if (today.getDate() >= day) {
+        return nextMonth;
+      } else {
+        return new Date(today.getFullYear(), today.getMonth(), day);
+      }
+    }
+
+    function calculatePortfolioStats() {
+      const totalInvested = portfolioData.sips.reduce((sum, sip) => sum + sip.invested, 0);
+      const totalValue = portfolioData.sips.reduce((sum, sip) => sum + sip.currentValue, 0);
+      const totalReturns = totalValue - totalInvested;
+      const overallReturn = totalInvested > 0 ? ((totalReturns / totalInvested) * 100).toFixed(1) : '0.0';
+      const monthlyAmount = portfolioData.sips.reduce((sum, sip) => sum + sip.monthlyAmount, 0);
+      
+      return {
+        totalInvested,
+        totalValue,
+        totalReturns,
+        overallReturn,
+        monthlyAmount,
+        activeSIPs: portfolioData.sips.length
+      };
+    }
+
+    function updateDashboard() {
+      const stats = calculatePortfolioStats();
+      
+      // Update portfolio overview
+      document.getElementById('portfolioValue').textContent = `$${stats.totalValue.toLocaleString('en-US')}`;
+      document.getElementById('totalInvestment').textContent = `$${stats.totalInvested.toLocaleString('en-US')}`;
+      document.getElementById('totalReturns').textContent = `$${stats.totalReturns.toLocaleString('en-US')}`;
+      document.getElementById('portfolioReturn').textContent = `+${stats.overallReturn}% overall returns`;
+      document.getElementById('activeSIPs').textContent = stats.activeSIPs;
+      document.getElementById('monthlyAmount').textContent = `$${stats.monthlyAmount.toLocaleString('en-US')}/month`;
+      document.getElementById('fundCount').textContent = `Across ${stats.activeSIPs} funds`;
+      document.getElementById('xirr').textContent = `${stats.overallReturn}% XIRR`;
+      
+      // Update last updated time
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleString('en-IN');
+      
+      // Update active SIPs
+      const sipsList = document.getElementById('activeSIPsList');
+      sipsList.innerHTML = '';
+      
+      if (portfolioData.sips.length === 0) {
+        sipsList.innerHTML = `
+          <div class="text-center py-12">
+            <div class="mb-6">
+              <svg class="w-20 h-20 mx-auto text-green-200 mb-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Your investment journey starts here!</h3>
+              <p class="text-gray-600 mb-6">Start your first SIP and watch your wealth grow systematically. Even $50/month can create significant wealth over time.</p>
+              <button onclick="startQuickSIP()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                🚀 Start Your First SIP
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        portfolioData.sips.forEach(sip => {
+          const sipDiv = document.createElement('div');
+          sipDiv.className = 'flex justify-between items-center p-4 bg-gray-50 rounded-lg';
+          sipDiv.innerHTML = `
+            <div>
+              <h4 class="font-medium text-gray-900">${sip.name}</h4>
+              <p class="text-sm text-gray-600">$${sip.monthlyAmount.toLocaleString('en-US')}/month • Next: ${sip.nextDate.toLocaleDateString('en-US')}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-medium text-gray-900">$${sip.currentValue.toLocaleString('en-US')}</p>
+              <p class="text-sm text-green-600">+${sip.returns}%</p>
+            </div>
+          `;
+          sipsList.appendChild(sipDiv);
+        });
+      }
+      
+      // Update upcoming investments
+      const upcomingList = document.getElementById('upcomingInvestments');
+      upcomingList.innerHTML = '';
+      
+      // Combine SIP installments and other upcoming investments
+      const allUpcoming = [];
+      
+      // Add SIP installments
+      portfolioData.sips.forEach(sip => {
+        allUpcoming.push({
+          name: sip.name,
+          type: 'SIP Installment',
+          amount: sip.monthlyAmount,
+          date: sip.nextDate
+        });
+      });
+      
+      // Add other upcoming investments
+      if (portfolioData.upcomingInvestments) {
+        allUpcoming.push(...portfolioData.upcomingInvestments);
+      }
+      
+      // Sort by date
+      allUpcoming.sort((a, b) => a.date - b.date);
+      
+      if (allUpcoming.length === 0) {
+        upcomingList.innerHTML = `
+          <div class="text-center py-12">
+            <div class="mb-6">
+              <svg class="w-16 h-16 mx-auto text-blue-200 mb-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Schedule your investments</h3>
+              <p class="text-gray-600 mb-6">Set up SIPs to automate your investments and never miss a market opportunity.</p>
+              <button onclick="window.location.href='sip-calculator.html'" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                📅 Plan Your SIPs
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        allUpcoming.forEach((investment, index) => {
+          const colorClasses = [
+            'border-green-500 bg-green-50',
+            'border-blue-500 bg-blue-50', 
+            'border-purple-500 bg-purple-50',
+            'border-orange-500 bg-orange-50'
+          ];
+          const colorClass = colorClasses[index % colorClasses.length];
+          
+          const upcomingDiv = document.createElement('div');
+          upcomingDiv.className = `flex justify-between items-center p-4 border-l-4 ${colorClass} rounded-lg`;
+          upcomingDiv.innerHTML = `
+            <div>
+              <h4 class="font-medium text-gray-900">${investment.name}</h4>
+              <p class="text-sm text-gray-600">${investment.type}</p>
+            </div>
+            <div class="text-right">
+              <p class="font-medium text-gray-900">$${investment.amount.toLocaleString('en-US')}</p>
+              <p class="text-sm text-gray-600">${investment.date.toLocaleDateString('en-US')}</p>
+            </div>
+          `;
+          upcomingList.appendChild(upcomingDiv);
+        });
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'index.html';
+      }
+    }
+
+    async function loadUserData() {
+      try {
+        const token = localStorage.getItem('token');
+        const demoMode = localStorage.getItem('demoMode');
+        
+        if (demoMode === 'true') {
+          document.getElementById('userName').textContent = 'User';
+          loadDemoData();
+          return;
+        }
+        
+        if (token) {
+          const result = await API.get('/user-profile');
+          if (result.success) {
+            document.getElementById('userName').textContent = result.user.name;
+          }
+        }
+      } catch (error) {
+        console.log('Could not load user data');
+      }
+    }
+    
+    function loadDemoData() {
+      portfolioData = demoPortfolioData;
+      fundHoldings = demoFundHoldings;
+      allocationData = demoAllocationData;
+      chartData = demoChartData;
+    }
+
+    // Portfolio chart data
+    let chartData = {
+      '6M': {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        data: [0, 0, 0, 0, 0, 0]
+      },
+      '1Y': {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      },
+      '2Y': {
+        labels: ['2023 Q1', '2023 Q2', '2023 Q3', '2023 Q4', '2024 Q1', '2024 Q2', '2024 Q3', '2024 Q4'],
+        data: [0, 0, 0, 0, 0, 0, 0, 0]
+      }
+    };
+    
+    // Demo chart data
+    const demoChartData = {
+      '6M': {
+        labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        data: [5000, 5500, 6200, 7100, 8500, 9600]
+      },
+      '1Y': {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        data: [1000, 1800, 2500, 3200, 4100, 4800, 5000, 5500, 6200, 7100, 8500, 9600]
+      },
+      '2Y': {
+        labels: ['2023 Q1', '2023 Q2', '2023 Q3', '2023 Q4', '2024 Q1', '2024 Q2', '2024 Q3', '2024 Q4'],
+        data: [500, 1200, 2100, 3500, 4800, 6200, 7800, 9600]
+      }
+    };
+    
+    let portfolioChart;
+    let allocationChart;
+    let comparisonChart;
+    
+    // Portfolio allocation data (empty for new users)
+    let allocationData = {
+      labels: ['Equity', 'Debt', 'Gold'],
+      data: [0, 0, 0],
+      colors: ['#059669', '#3B82F6', '#F59E0B']
+    };
+    
+    // Demo allocation data
+    const demoAllocationData = {
+      labels: ['Equity', 'Debt', 'Hybrid'],
+      data: [65, 25, 10],
+      colors: ['#059669', '#3B82F6', '#F59E0B']
+    };
+    
+    // Fund holdings data (empty for new users)
+    let fundHoldings = [];
+    
+    // Demo fund holdings
+    const demoFundHoldings = [
+      {
+        name: 'SBI Bluechip Fund',
+        category: 'Large Cap',
+        value: 6750,
+        returns: 12.5
+      },
+      {
+        name: 'HDFC Mid Cap Fund',
+        category: 'Mid Cap',
+        value: 4170,
+        returns: 15.8
+      },
+      {
+        name: 'ICICI Balanced Fund',
+        category: 'Hybrid',
+        value: 2580,
+        returns: 11.2
+      }
+    ];
+    
+    // Financial goals data
+    const financialGoals = [
+      {
+        id: 1,
+        name: 'Retirement Fund',
+        targetAmount: 500000,
+        currentAmount: 0,
+        targetDate: '2045-12-31',
+        icon: '🏖️',
+        color: 'blue'
+      },
+      {
+        id: 2,
+        name: 'Emergency Fund',
+        targetAmount: 50000,
+        currentAmount: 0,
+        targetDate: '2025-12-31',
+        icon: '🛡️',
+        color: 'red'
+      },
+      {
+        id: 3,
+        name: 'Dream Vacation',
+        targetAmount: 15000,
+        currentAmount: 0,
+        targetDate: '2025-06-30',
+        icon: '✈️',
+        color: 'purple'
+      }
+    ];
+    
+    function initChart() {
+      // Show chart after loading
+      setTimeout(() => {
+        document.getElementById('portfolioChartLoader').classList.add('hidden');
+        document.getElementById('portfolioChart').classList.remove('hidden');
+      }, 1500);
+      
+      const ctx = document.getElementById('portfolioChart').getContext('2d');
+      portfolioChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chartData['1Y'].labels,
+          datasets: [{
+            label: 'Portfolio Value ($)',
+            data: chartData['1Y'].data,
+            borderColor: '#059669',
+            backgroundColor: 'rgba(5, 150, 105, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: 'white',
+              bodyColor: 'white',
+              borderColor: '#059669',
+              borderWidth: 1,
+              callbacks: {
+                title: function(context) {
+                  return context[0].label;
+                },
+                label: function(context) {
+                  return 'Portfolio Value: $' + context.raw.toLocaleString();
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value.toLocaleString();
+                }
+              }
+            }
+          },
+          elements: {
+            point: {
+              radius: 4,
+              hoverRadius: 6
+            }
+          }
+        }
+      });
+    }
+    
+    function initAllocationChart() {
+      // Show chart after loading
+      setTimeout(() => {
+        document.getElementById('allocationChartLoader').classList.add('hidden');
+        document.getElementById('allocationChart').classList.remove('hidden');
+      }, 2000);
+      
+      const ctx = document.getElementById('allocationChart').getContext('2d');
+      allocationChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: allocationData.labels,
+          datasets: [{
+            data: allocationData.data,
+            backgroundColor: allocationData.colors,
+            borderWidth: 0,
+            cutout: '60%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+                  return context.label + ': ' + percentage + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function updateFundHoldings() {
+      const holdingsDiv = document.getElementById('fundHoldings');
+      
+      if (fundHoldings.length === 0) {
+        holdingsDiv.innerHTML = `
+          <div class="text-center py-10">
+            <div class="mb-6">
+              <svg class="w-16 h-16 mx-auto text-purple-200 mb-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Build your portfolio</h3>
+              <p class="text-gray-600 mb-6">Diversify across different funds to optimize returns and manage risk effectively.</p>
+              <button onclick="window.location.href='funds.html'" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                🎯 Explore Funds
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      holdingsDiv.innerHTML = '';
+      fundHoldings.forEach(fund => {
+        const fundDiv = document.createElement('div');
+        fundDiv.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+        fundDiv.innerHTML = `
+          <div>
+            <h4 class="font-medium text-gray-900 text-sm">${fund.name}</h4>
+            <p class="text-xs text-gray-600">${fund.category}</p>
+          </div>
+          <div class="text-right">
+            <p class="font-medium text-gray-900 text-sm">$${fund.value.toLocaleString()}</p>
+            <p class="text-xs ${fund.returns >= 0 ? 'text-green-600' : 'text-red-600'}">+${fund.returns}%</p>
+          </div>
+        `;
+        holdingsDiv.appendChild(fundDiv);
+      });
+    }
+    
+    function updateChart(period) {
+      // Update button styles
+      document.querySelectorAll('[id^="btn-"]').forEach(btn => {
+        btn.className = 'px-3 py-1 text-sm bg-gray-100 hover:bg-green-100 rounded transition-colors';
+      });
+      document.getElementById(`btn-${period}`).className = 'px-3 py-1 text-sm bg-green-100 text-green-700 rounded transition-colors';
+      
+      // Update chart data
+      portfolioChart.data.labels = chartData[period].labels;
+      portfolioChart.data.datasets[0].data = chartData[period].data;
+      portfolioChart.update();
+    }
+
+    // Notifications data
+    const notifications = [
+      {
+        id: 1,
+        type: 'success',
+        title: 'Investment Successful',
+        message: 'Your SIP of $100 in SBI Bluechip Fund was successful.',
+        time: '2 minutes ago',
+        icon: '✅'
+      },
+      {
+        id: 2,
+        type: 'market',
+        title: 'Market Alert',
+        message: 'The Nifty 50 index is up 1.5% today.',
+        time: '1 hour ago',
+        icon: '📈'
+      },
+      {
+        id: 3,
+        type: 'milestone',
+        title: 'Goal Milestone',
+        message: 'Congratulations! You\'ve reached 25% of your Emergency Fund goal.',
+        time: '3 hours ago',
+        icon: '🎯'
+      }
+    ];
+    
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    }
+    
+    // Notification functions
+    function toggleNotifications() {
+      const dropdown = document.getElementById('notificationDropdown');
+      dropdown.classList.toggle('hidden');
+      
+      // Ensure notifications are updated when dropdown is shown
+      if (!dropdown.classList.contains('hidden')) {
+        updateNotifications();
+      }
+    }
+    
+    function updateNotifications() {
+      const notificationsList = document.getElementById('notificationsList');
+      const badge = document.getElementById('notificationBadge');
+      
+      // Update badge count
+      badge.textContent = notifications.length;
+      if (notifications.length === 0) {
+        badge.classList.add('hidden');
+      } else {
+        badge.classList.remove('hidden');
+      }
+      
+      // Update notifications list
+      if (notifications.length === 0) {
+        notificationsList.innerHTML = `
+          <div class="p-6 text-center text-gray-500">
+            <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+            </svg>
+            <p class="text-sm font-medium text-gray-700 mb-1">All caught up!</p>
+            <p class="text-xs text-gray-500">We'll notify you about important updates</p>
+          </div>
+        `;
+        return;
+      }
+      
+      notificationsList.innerHTML = '';
+      notifications.forEach(notification => {
+        const notificationDiv = document.createElement('div');
+        notificationDiv.className = 'p-3 border-b hover:bg-gray-50 cursor-pointer';
+        notificationDiv.innerHTML = `
+          <div class="flex items-start space-x-3">
+            <span class="text-lg">${notification.icon}</span>
+            <div class="flex-1">
+              <h4 class="font-medium text-gray-900 text-sm">${notification.title}</h4>
+              <p class="text-sm text-gray-600 mt-1">${notification.message}</p>
+              <p class="text-xs text-gray-400 mt-1">${notification.time}</p>
+            </div>
+          </div>
+        `;
+        notificationsList.appendChild(notificationDiv);
+      });
+    }
+    
+    function clearAllNotifications() {
+      notifications.length = 0;
+      updateNotifications();
+      document.getElementById('notificationDropdown').classList.add('hidden');
+    }
+    
+    // Close notifications when clicking outside
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('notificationDropdown');
+      const button = event.target.closest('button');
+      
+      if (!dropdown.contains(event.target) && button?.onclick !== toggleNotifications) {
+        dropdown.classList.add('hidden');
+      }
+    });
+    
+    // Goal tracking functions
+    function updateGoals() {
+      const goalsList = document.getElementById('goalsList');
+      
+      if (financialGoals.length === 0) {
+        goalsList.innerHTML = `
+          <div class="text-center py-12">
+            <div class="mb-6">
+              <svg class="w-20 h-20 mx-auto text-orange-200 mb-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"></path>
+              </svg>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Set your financial goals</h3>
+              <p class="text-gray-600 mb-6">Define your dreams and let us help you achieve them with personalized investment strategies.</p>
+              <button onclick="addNewGoal()" class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors font-medium">
+                🎯 Add Your First Goal
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      goalsList.innerHTML = '';
+      financialGoals.forEach(goal => {
+        const progress = (goal.currentAmount / goal.targetAmount) * 100;
+        const timeLeft = Math.ceil((new Date(goal.targetDate) - new Date()) / (1000 * 60 * 60 * 24));
+        
+        const goalDiv = document.createElement('div');
+        goalDiv.className = 'p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer';
+        goalDiv.onclick = () => toggleSIPCalculator(goal.id);
+        goalDiv.innerHTML = `
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">${goal.icon}</span>
+              <div>
+                <h4 class="font-medium text-gray-900">${goal.name}</h4>
+                <p class="text-sm text-gray-600">${timeLeft > 0 ? timeLeft + ' days left' : 'Overdue'}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="font-medium text-gray-900">$${goal.currentAmount.toLocaleString()} / $${goal.targetAmount.toLocaleString()}</p>
+              <p class="text-sm text-${goal.color}-600">${progress.toFixed(1)}% complete</p>
+            </div>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-${goal.color}-600 h-2 rounded-full transition-all duration-300" style="width: ${Math.min(progress, 100)}%"></div>
+          </div>
+          
+          <!-- SIP Calculator (Hidden by default) -->
+          <div id="sipCalc-${goal.id}" class="hidden mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <h5 class="font-medium text-blue-900 mb-3">📊 SIP Calculator</h5>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Required Monthly SIP:</span>
+                <span class="font-medium text-gray-900" id="requiredSIP-${goal.id}">$0</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-blue-600">To reach 2 years sooner:</span>
+                <span class="font-medium text-blue-600" id="acceleratedSIP-${goal.id}">+$0/month</span>
+              </div>
+              <div class="text-xs text-blue-700 mt-2" id="sipAdvice-${goal.id}">
+                💡 Click to see personalized SIP recommendations
+              </div>
+              <div class="flex space-x-2 mt-3">
+                <button onclick="startSIPForGoal('${goal.name}', 0)" class="flex-1 bg-${goal.color}-600 text-white py-2 px-3 rounded text-xs hover:bg-${goal.color}-700 transition-colors" id="startSIPBtn-${goal.id}">
+                  Start SIP
+                </button>
+                <button onclick="startAcceleratedSIP('${goal.name}', 0)" class="flex-1 bg-blue-600 text-white py-2 px-3 rounded text-xs hover:bg-blue-700 transition-colors" id="accelerateSIPBtn-${goal.id}">
+                  Accelerate
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        goalsList.appendChild(goalDiv);
+      });
+    }
+    
+    function addNewGoal() {
+      const goalName = prompt('Enter goal name:');
+      const targetAmount = parseFloat(prompt('Enter target amount ($):'));
+      const targetDate = prompt('Enter target date (YYYY-MM-DD):');
+      
+      if (goalName && targetAmount && targetDate) {
+        const newGoal = {
+          id: Date.now(),
+          name: goalName,
+          targetAmount: targetAmount,
+          currentAmount: 0,
+          targetDate: targetDate,
+          icon: '🎯',
+          color: 'green'
+        };
+        
+        financialGoals.push(newGoal);
+        updateGoals();
+      }
+    }
+    
+    // Personalized insights function
+    function generateInsights() {
+      const insights = [];
+      const stats = calculatePortfolioStats();
+      
+      // Portfolio diversification insight
+      if (stats.totalValue === 0) {
+        insights.push({
+          type: 'start',
+          icon: '🚀',
+          message: 'Ready to start your investment journey? Begin with a diversified portfolio of equity and debt funds.',
+          action: 'Start Investing'
+        });
+      } else {
+        // Assume 85% equity for demo (in real app, calculate from actual holdings)
+        insights.push({
+          type: 'diversification',
+          icon: '⚖️',
+          message: 'Your portfolio appears to be heavily weighted in equity. Consider adding debt funds to improve diversification.',
+          action: 'Explore Debt Funds'
+        });
+      }
+      
+      // SIP consistency insight
+      if (stats.activeSIPs === 0) {
+        insights.push({
+          type: 'sip',
+          icon: '📅',
+          message: 'Start a SIP to build wealth consistently. Even $100/month can grow significantly over time.',
+          action: 'Start SIP'
+        });
+      } else if (stats.activeSIPs < 3) {
+        insights.push({
+          type: 'sip',
+          icon: '📈',
+          message: 'Great job on your SIPs! Consider adding more SIPs across different fund categories for better diversification.',
+          action: 'Add More SIPs'
+        });
+      }
+      
+      // Goal progress insight
+      const urgentGoals = financialGoals.filter(goal => {
+        const timeLeft = (new Date(goal.targetDate) - new Date()) / (1000 * 60 * 60 * 24);
+        const progress = (goal.currentAmount / goal.targetAmount) * 100;
+        return timeLeft < 365 && progress < 50;
+      });
+      
+      if (urgentGoals.length > 0) {
+        insights.push({
+          type: 'goal',
+          icon: '⏰',
+          message: `Your ${urgentGoals[0].name} goal needs attention. Consider increasing your monthly investment to stay on track.`,
+          action: 'Boost Investment'
+        });
+      }
+      
+      // Cash insight (assuming user has uninvested cash)
+      insights.push({
+        type: 'cash',
+        icon: '💰',
+        message: 'You have uninvested cash in your wallet. Put it to work by investing in mutual funds!',
+        action: 'Invest Now'
+      });
+      
+      return insights.slice(0, 3); // Show max 3 insights
+    }
+    
+    function updateInsights() {
+      const insightsList = document.getElementById('insightsList');
+      const insights = generateInsights();
+      
+      insightsList.innerHTML = '';
+      insights.forEach(insight => {
+        const insightDiv = document.createElement('div');
+        insightDiv.className = 'flex items-start space-x-3 p-3 bg-white rounded-lg border';
+        insightDiv.innerHTML = `
+          <span class="text-lg">${insight.icon}</span>
+          <div class="flex-1">
+            <p class="text-sm text-gray-700">${insight.message}</p>
+          </div>
+          <button onclick="handleInsightAction('${insight.type}')" class="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-colors">
+            ${insight.action}
+          </button>
+        `;
+        insightsList.appendChild(insightDiv);
+      });
+    }
+    
+    function handleInsightAction(type) {
+      switch(type) {
+        case 'start':
+        case 'sip':
+          startQuickSIP();
+          break;
+        case 'diversification':
+          window.location.href = 'funds.html';
+          break;
+        case 'goal':
+          addNewGoal();
+          break;
+        case 'cash':
+          investQuickly();
+          break;
+        default:
+          alert('Feature coming soon!');
+      }
+    }
+    
+    // Download reports function
+    function downloadReport(reportType) {
+      const period = document.getElementById('reportPeriod').value;
+      const userName = document.getElementById('userName').textContent;
+      const currentDate = new Date().toLocaleDateString();
+      
+      // Generate report content based on type
+      let reportContent = '';
+      let fileName = '';
+      
+      switch(reportType) {
+        case 'portfolio':
+          fileName = `Portfolio_Statement_${currentDate.replace(/\//g, '-')}.pdf`;
+          reportContent = generatePortfolioReport(period);
+          break;
+        case 'transactions':
+          fileName = `Transaction_History_${currentDate.replace(/\//g, '-')}.pdf`;
+          reportContent = generateTransactionReport(period);
+          break;
+        case 'capital-gains':
+          fileName = `Capital_Gains_${currentDate.replace(/\//g, '-')}.pdf`;
+          reportContent = generateCapitalGainsReport(period);
+          break;
+      }
+      
+      // Simulate PDF download (in real app, would generate actual PDF)
+      const blob = new Blob([reportContent], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      // Show success message
+      alert(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} report downloaded successfully!`);
+    }
+    
+    function generatePortfolioReport(period) {
+      const stats = calculatePortfolioStats();
+      return `
+DEBTMANAGE - PORTFOLIO HOLDING STATEMENT
+========================================
+
+User: ${document.getElementById('userName').textContent}
+Report Date: ${new Date().toLocaleDateString()}
+Period: ${period.replace('-', ' ').toUpperCase()}
+
+PORTFOLIO SUMMARY
+-----------------
+Total Portfolio Value: $${stats.totalValue.toLocaleString()}
+Total Investment: $${stats.totalInvested.toLocaleString()}
+Total Returns: $${stats.totalReturns.toLocaleString()}
+Overall Return: ${stats.overallReturn}%
+
+ACTIVE SIPs
+-----------
+Number of Active SIPs: ${stats.activeSIPs}
+Monthly SIP Amount: $${stats.monthlyAmount.toLocaleString()}
+
+FUND HOLDINGS
+-------------
+${fundHoldings.length === 0 ? 'No current holdings' : fundHoldings.map(fund => 
+  `${fund.name}: $${fund.value.toLocaleString()} (${fund.returns}% returns)`
+).join('\n')}
+
+This is a computer-generated statement.
+      `;
+    }
+    
+    function generateTransactionReport(period) {
+      return `
+DEBTMANAGE - TRANSACTION HISTORY
+===============================
+
+User: ${document.getElementById('userName').textContent}
+Report Date: ${new Date().toLocaleDateString()}
+Period: ${period.replace('-', ' ').toUpperCase()}
+
+TRANSACTION SUMMARY
+------------------
+Total Transactions: 0
+Total Buy Amount: $0
+Total Sell Amount: $0
+
+TRANSACTION DETAILS
+------------------
+No transactions found for the selected period.
+
+Note: This report includes all buy, sell, and SIP transactions.
+This is a computer-generated statement.
+      `;
+    }
+    
+    function generateCapitalGainsReport(period) {
+      return `
+DEBTMANAGE - CAPITAL GAINS STATEMENT
+===================================
+
+User: ${document.getElementById('userName').textContent}
+Report Date: ${new Date().toLocaleDateString()}
+Period: ${period.replace('-', ' ').toUpperCase()}
+
+CAPITAL GAINS SUMMARY
+--------------------
+Short Term Capital Gains: $0
+Long Term Capital Gains: $0
+Total Capital Gains: $0
+
+TAX IMPLICATIONS
+---------------
+STCG Tax (15%): $0
+LTCG Tax (10% above $1,250): $0
+Total Tax Liability: $0
+
+DETAILED TRANSACTIONS
+--------------------
+No capital gains transactions found for the selected period.
+
+Note: This report is for reference only. Please consult a tax advisor.
+This is a computer-generated statement.
+      `;
+    }
+    
+    // SIP Calculator Functions
+    function toggleSIPCalculator(goalId) {
+      const sipCalc = document.getElementById(`sipCalc-${goalId}`);
+      const isHidden = sipCalc.classList.contains('hidden');
+      
+      // Hide all other calculators
+      document.querySelectorAll('[id^="sipCalc-"]').forEach(calc => {
+        calc.classList.add('hidden');
+      });
+      
+      if (isHidden) {
+        sipCalc.classList.remove('hidden');
+        calculateSIPForGoal(goalId);
+      }
+    }
+    
+    function calculateSIPForGoal(goalId) {
+      const goal = financialGoals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      const timeLeft = Math.ceil((new Date(goal.targetDate) - new Date()) / (1000 * 60 * 60 * 24));
+      const monthsLeft = Math.ceil(timeLeft / 30);
+      const remainingAmount = goal.targetAmount - goal.currentAmount;
+      
+      const requiredMonthlySIP = monthsLeft > 0 ? Math.ceil(remainingAmount / monthsLeft) : 0;
+      const acceleratedMonths = Math.max(1, monthsLeft - 24); // 2 years sooner
+      const acceleratedSIP = acceleratedMonths > 0 ? Math.ceil(remainingAmount / acceleratedMonths) : requiredMonthlySIP;
+      const sipIncrease = acceleratedSIP - requiredMonthlySIP;
+      
+      // Update display
+      document.getElementById(`requiredSIP-${goalId}`).textContent = `$${requiredMonthlySIP.toLocaleString()}`;
+      document.getElementById(`acceleratedSIP-${goalId}`).textContent = `+$${sipIncrease.toLocaleString()}/month`;
+      document.getElementById(`sipAdvice-${goalId}`).textContent = 
+        sipIncrease > 0 ? `💡 Increase your SIP by $${sipIncrease} to achieve this goal 2 years earlier!` : 
+        '💡 You\'re on track! Start your SIP to reach this goal on time.';
+      
+      // Update button actions
+      document.getElementById(`startSIPBtn-${goalId}`).onclick = (e) => {
+        e.stopPropagation();
+        startSIPForGoal(goal.name, requiredMonthlySIP);
+      };
+      document.getElementById(`accelerateSIPBtn-${goalId}`).onclick = (e) => {
+        e.stopPropagation();
+        startAcceleratedSIP(goal.name, acceleratedSIP);
+      };
+    }
+    
+    function startSIPForGoal(goalName, amount) {
+      localStorage.setItem('investmentData', JSON.stringify({
+        type: 'SIP',
+        fund: 'SBI Bluechip Fund',
+        amount: amount,
+        date: 15,
+        goalLinked: goalName
+      }));
+      
+      alert(`Starting SIP of $${amount.toLocaleString()}/month for your "${goalName}" goal!`);
+      window.location.href = 'payment.html';
+    }
+    
+    function startAcceleratedSIP(goalName, amount) {
+      localStorage.setItem('investmentData', JSON.stringify({
+        type: 'SIP',
+        fund: 'SBI Bluechip Fund',
+        amount: amount,
+        date: 15,
+        goalLinked: goalName,
+        accelerated: true
+      }));
+      
+      alert(`Starting accelerated SIP of $${amount.toLocaleString()}/month to reach your "${goalName}" goal 2 years sooner!`);
+      window.location.href = 'payment.html';
+    }
+
+    // Fund comparison data
+    const comparisonData = {
+      '1Y': {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [
+          {
+            label: 'SBI Bluechip Fund',
+            data: [100, 102, 105, 108, 106, 110, 112, 115, 113, 118, 120, 125],
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)'
+          },
+          {
+            label: 'HDFC Mid Cap Fund', 
+            data: [100, 103, 107, 105, 109, 114, 118, 116, 120, 125, 128, 132],
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)'
+          },
+          {
+            label: 'Nifty 50 (Benchmark)',
+            data: [100, 101, 103, 106, 104, 107, 109, 111, 108, 112, 115, 118],
+            borderColor: '#F59E0B',
+            backgroundColor: 'rgba(245, 158, 11, 0.1)'
+          }
+        ]
+      }
+    };
+    
+    function initComparisonChart() {
+      // Show chart after loading
+      setTimeout(() => {
+        document.getElementById('comparisonChartLoader').classList.add('hidden');
+        document.getElementById('comparisonChart').classList.remove('hidden');
+      }, 1800);
+      
+      const ctx = document.getElementById('comparisonChart').getContext('2d');
+      comparisonChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: comparisonData['1Y'].labels,
+          datasets: comparisonData['1Y'].datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 15,
+                font: { size: 11 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label + ': ' + context.raw + '%';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                }
+              }
+            }
+          },
+          elements: {
+            point: {
+              radius: 3,
+              hoverRadius: 5
+            },
+            line: {
+              borderWidth: 2,
+              tension: 0.4
+            }
+          }
+        }
+      });
+    }
+    
+    function updateComparison() {
+      const period = document.getElementById('comparisonPeriod').value;
+      // In a real app, this would fetch data for different periods
+      // For now, we'll use the same 1Y data
+      comparisonChart.data.labels = comparisonData['1Y'].labels;
+      comparisonChart.data.datasets = comparisonData['1Y'].datasets;
+      comparisonChart.update();
+    }
+
+    // Initialize dashboard
+    checkAuth();
+    loadUserData();
+    updateDashboard();
+    initChart();
+    initAllocationChart();
+    initComparisonChart();
+    updateFundHoldings();
+    updateGoals();
+    updateNotifications();
+    updateInsights();
+    
+    // Add event listeners for buttons
+    document.getElementById('startSIPBtn').addEventListener('click', startQuickSIP);
+    document.getElementById('investNowBtn').addEventListener('click', investQuickly);
+    
+    // Update dashboard every 30 seconds
+    setInterval(updateDashboard, 30000);
+    
+    // Quick investment functions
+    function startQuickSIP() {
+      try {
+        window.location.href = 'start-sip.html';
+      } catch (error) {
+        console.error('Error in startQuickSIP:', error);
+        alert('Error starting SIP. Please try again.');
+      }
+    }
+    
+    function investQuickly() {
+      try {
+        localStorage.setItem('investmentData', JSON.stringify({
+          type: 'Lumpsum',
+          fund: 'SBI Bluechip Fund',
+          amount: 10000,
+          units: '219.05'
+        }));
+        window.location.href = 'payment.html';
+      } catch (error) {
+        console.error('Error in investQuickly:', error);
+        alert('Error starting investment. Please try again.');
+      }
+    }
+  </script>
+</body>
+</html>

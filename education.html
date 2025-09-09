@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Learn - DebtManage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-8">
+          <a href="groww-mvp.html" class="text-2xl font-bold text-green-600">DebtManage</a>
+          <div class="hidden md:flex space-x-6">
+            <a href="dashboard.html" class="text-gray-600 hover:text-green-600">Dashboard</a>
+            <a href="funds.html" class="text-gray-600 hover:text-green-600">Explore Funds</a>
+            <a href="sip-calculator.html" class="text-gray-600 hover:text-green-600">SIP Calculator</a>
+            <a href="transactions.html" class="text-gray-600 hover:text-green-600">Transactions</a>
+            <a href="education.html" class="text-green-600 font-medium">Learn</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-8 mb-8 text-white">
+      <div class="max-w-3xl">
+        <h1 class="text-4xl font-bold mb-4">Learn Smart Investing</h1>
+        <p class="text-xl opacity-90 mb-6">Master the fundamentals of mutual funds, SIPs, and personal finance with our comprehensive guides</p>
+        <div class="flex space-x-4">
+          <button onclick="scrollToSection('basics')" class="bg-white text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Start Learning
+          </button>
+          <button onclick="scrollToSection('calculator')" class="border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-green-600 transition-colors">
+            Try Calculator
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning Categories -->
+    <div class="grid md:grid-cols-3 gap-6 mb-12">
+      <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="filterArticles('basics')">
+        <div class="text-3xl mb-4">📚</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Investing Basics</h3>
+        <p class="text-gray-600">Learn the fundamentals of investing, risk management, and portfolio building</p>
+      </div>
+      
+      <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="filterArticles('sip')">
+        <div class="text-3xl mb-4">💰</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">SIP & Mutual Funds</h3>
+        <p class="text-gray-600">Understand SIPs, mutual fund types, and systematic investment strategies</p>
+      </div>
+      
+      <div class="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="filterArticles('planning')">
+        <div class="text-3xl mb-4">🎯</div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Financial Planning</h3>
+        <p class="text-gray-600">Plan for retirement, goals, tax saving, and wealth creation strategies</p>
+      </div>
+    </div>
+
+    <!-- Featured Articles -->
+    <div class="mb-12">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Featured Articles</h2>
+        <div class="flex space-x-2">
+          <button onclick="filterArticles('all')" id="filter-all" class="px-4 py-2 text-sm font-medium rounded-lg bg-green-100 text-green-700">
+            All
+          </button>
+          <button onclick="filterArticles('basics')" id="filter-basics" class="px-4 py-2 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+            Basics
+          </button>
+          <button onclick="filterArticles('sip')" id="filter-sip" class="px-4 py-2 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+            SIP
+          </button>
+          <button onclick="filterArticles('planning')" id="filter-planning" class="px-4 py-2 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-100">
+            Planning
+          </button>
+        </div>
+      </div>
+
+      <div id="articlesList" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Articles will be populated here -->
+      </div>
+    </div>
+
+    <!-- Interactive Tools -->
+    <div class="bg-white rounded-xl shadow-sm border p-8 mb-12">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Interactive Learning Tools</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="text-center p-6 border rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors cursor-pointer" onclick="window.location.href='sip-calculator.html'">
+          <div class="text-3xl mb-3">🧮</div>
+          <h4 class="font-semibold text-gray-900 mb-2">SIP Calculator</h4>
+          <p class="text-sm text-gray-600">Calculate your SIP returns and plan investments</p>
+        </div>
+        
+        <div class="text-center p-6 border rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors cursor-pointer" onclick="openRiskAssessment()">
+          <div class="text-3xl mb-3">⚖️</div>
+          <h4 class="font-semibold text-gray-900 mb-2">Risk Assessment</h4>
+          <p class="text-sm text-gray-600">Discover your risk tolerance and investment style</p>
+        </div>
+        
+        <div class="text-center p-6 border rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors cursor-pointer" onclick="openGoalPlanner()">
+          <div class="text-3xl mb-3">🎯</div>
+          <h4 class="font-semibold text-gray-900 mb-2">Goal Planner</h4>
+          <p class="text-sm text-gray-600">Plan and track your financial goals</p>
+        </div>
+        
+        <div class="text-center p-6 border rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors cursor-pointer" onclick="openTaxCalculator()">
+          <div class="text-3xl mb-3">📊</div>
+          <h4 class="font-semibold text-gray-900 mb-2">Tax Calculator</h4>
+          <p class="text-sm text-gray-600">Calculate tax savings with ELSS investments</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="bg-white rounded-xl shadow-sm border p-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        <div class="border-b pb-4">
+          <button onclick="toggleFAQ('faq1')" class="flex justify-between items-center w-full text-left">
+            <h4 class="font-semibold text-gray-900">What is a SIP and how does it work?</h4>
+            <svg id="faq1-icon" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="faq1-content" class="hidden mt-3 text-gray-600">
+            <p>A Systematic Investment Plan (SIP) is a method of investing in mutual funds where you invest a fixed amount regularly (monthly, quarterly, etc.). It helps in rupee cost averaging and disciplined investing, making it easier to build wealth over time without timing the market.</p>
+          </div>
+        </div>
+        
+        <div class="border-b pb-4">
+          <button onclick="toggleFAQ('faq2')" class="flex justify-between items-center w-full text-left">
+            <h4 class="font-semibold text-gray-900">How much should I invest in SIP monthly?</h4>
+            <svg id="faq2-icon" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="faq2-content" class="hidden mt-3 text-gray-600">
+            <p>The ideal SIP amount depends on your income, expenses, and financial goals. A good rule of thumb is to invest 10-20% of your monthly income. Start with a comfortable amount like ₹1,000-₹5,000 and gradually increase as your income grows.</p>
+          </div>
+        </div>
+        
+        <div class="border-b pb-4">
+          <button onclick="toggleFAQ('faq3')" class="flex justify-between items-center w-full text-left">
+            <h4 class="font-semibold text-gray-900">What are the different types of mutual funds?</h4>
+            <svg id="faq3-icon" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="faq3-content" class="hidden mt-3 text-gray-600">
+            <p>Main types include: <strong>Equity Funds</strong> (invest in stocks, higher risk-return), <strong>Debt Funds</strong> (invest in bonds, lower risk), <strong>Hybrid Funds</strong> (mix of equity and debt), and <strong>ELSS Funds</strong> (tax-saving equity funds with 3-year lock-in).</p>
+          </div>
+        </div>
+        
+        <div class="border-b pb-4">
+          <button onclick="toggleFAQ('faq4')" class="flex justify-between items-center w-full text-left">
+            <h4 class="font-semibold text-gray-900">Is it safe to invest in mutual funds?</h4>
+            <svg id="faq4-icon" class="w-5 h-5 text-gray-500 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          <div id="faq4-content" class="hidden mt-3 text-gray-600">
+            <p>Mutual funds are regulated by SEBI and are relatively safe investment vehicles. However, they carry market risks. Diversification across different funds and long-term investing can help mitigate risks. Always invest based on your risk tolerance and financial goals.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const articles = [
+      {
+        id: 1,
+        title: "Complete Guide to SIP Investing",
+        category: "sip",
+        readTime: "8 min read",
+        image: "📈",
+        excerpt: "Learn everything about Systematic Investment Plans, how they work, and why they're perfect for beginners.",
+        featured: true
+      },
+      {
+        id: 2,
+        title: "Understanding Mutual Fund Types",
+        category: "basics",
+        readTime: "6 min read",
+        image: "📊",
+        excerpt: "Explore different types of mutual funds - equity, debt, hybrid, and ELSS funds with examples.",
+        featured: true
+      },
+      {
+        id: 3,
+        title: "Building Your First Investment Portfolio",
+        category: "planning",
+        readTime: "10 min read",
+        image: "🎯",
+        excerpt: "Step-by-step guide to creating a diversified investment portfolio based on your goals and risk tolerance.",
+        featured: true
+      },
+      {
+        id: 4,
+        title: "Tax Saving with ELSS Funds",
+        category: "planning",
+        readTime: "5 min read",
+        image: "💰",
+        excerpt: "How to save taxes up to ₹46,800 annually while building wealth with ELSS mutual funds.",
+        featured: false
+      },
+      {
+        id: 5,
+        title: "Risk Management in Investing",
+        category: "basics",
+        readTime: "7 min read",
+        image: "⚖️",
+        excerpt: "Understanding investment risks and strategies to manage them effectively for long-term success.",
+        featured: false
+      },
+      {
+        id: 6,
+        title: "Power of Compounding in SIPs",
+        category: "sip",
+        readTime: "4 min read",
+        image: "🚀",
+        excerpt: "See how compound interest can turn your small monthly SIPs into a large corpus over time.",
+        featured: true
+      }
+    ];
+
+    function renderArticles(articlesToRender = articles) {
+      const articlesList = document.getElementById('articlesList');
+      articlesList.innerHTML = '';
+
+      articlesToRender.forEach(article => {
+        const articleCard = `
+          <div class="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow cursor-pointer" onclick="openArticle(${article.id})">
+            <div class="p-6">
+              <div class="text-4xl mb-4">${article.image}</div>
+              <div class="flex items-center space-x-2 mb-3">
+                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full capitalize">
+                  ${article.category}
+                </span>
+                <span class="text-sm text-gray-500">${article.readTime}</span>
+                ${article.featured ? '<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Featured</span>' : ''}
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">${article.title}</h3>
+              <p class="text-gray-600 text-sm">${article.excerpt}</p>
+            </div>
+          </div>
+        `;
+        articlesList.innerHTML += articleCard;
+      });
+    }
+
+    function filterArticles(category) {
+      // Update filter button styles
+      document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+        btn.className = 'px-4 py-2 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-100';
+      });
+      document.getElementById(`filter-${category}`).className = 'px-4 py-2 text-sm font-medium rounded-lg bg-green-100 text-green-700';
+
+      // Filter articles
+      let filteredArticles = articles;
+      if (category !== 'all') {
+        filteredArticles = articles.filter(article => article.category === category);
+      }
+      
+      renderArticles(filteredArticles);
+    }
+
+    function openArticle(articleId) {
+      const article = articles.find(a => a.id === articleId);
+      alert(`Opening article: ${article.title}`);
+    }
+
+    function toggleFAQ(faqId) {
+      const content = document.getElementById(`${faqId}-content`);
+      const icon = document.getElementById(`${faqId}-icon`);
+      
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function scrollToSection(sectionId) {
+      // Smooth scroll to section
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function openRiskAssessment() {
+      alert('Opening Risk Assessment Tool...');
+    }
+
+    function openGoalPlanner() {
+      alert('Opening Goal Planning Tool...');
+    }
+
+    function openTaxCalculator() {
+      alert('Opening Tax Calculator...');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'groww-mvp.html';
+    }
+
+    // Initialize
+    renderArticles();
+  </script>
+</body>
+</html>

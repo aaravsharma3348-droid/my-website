@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Start SIP - DebtManage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow-sm border p-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-6">Start Your SIP</h1>
+      
+      <!-- Fund Collections -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">Choose Collection</label>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <button onclick="showCollection('popular')" id="popularBtn" class="p-4 border-2 border-green-500 bg-green-50 text-green-700 rounded-lg font-medium">
+            🔥 Popular Funds
+          </button>
+          <button onclick="showCollection('tax')" id="taxBtn" class="p-4 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:border-green-500">
+            💰 Tax Saver Funds
+          </button>
+        </div>
+      </div>
+
+      <!-- Fund Selection -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-3">Select Mutual Fund</label>
+        <div id="fundsList" class="space-y-3">
+          <!-- Funds will be populated here -->
+        </div>
+      </div>
+
+      <!-- SIP Amount -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Monthly SIP Amount</label>
+        <div class="grid grid-cols-3 gap-3 mb-3">
+          <button onclick="setAmount(50)" class="p-3 border rounded-lg hover:border-green-500 hover:bg-green-50 text-center">$50</button>
+          <button onclick="setAmount(100)" class="p-3 border rounded-lg hover:border-green-500 hover:bg-green-50 text-center">$100</button>
+          <button onclick="setAmount(500)" class="p-3 border rounded-lg hover:border-green-500 hover:bg-green-50 text-center">$500</button>
+        </div>
+        <input type="number" id="sipAmount" placeholder="Enter custom amount" min="50" step="10" class="w-full p-3 border rounded-lg focus:border-green-500 focus:outline-none">
+      </div>
+
+      <!-- SIP Date -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">SIP Date</label>
+        <select id="sipDate" class="w-full p-3 border rounded-lg focus:border-green-500 focus:outline-none">
+          <option value="1">1st of every month</option>
+          <option value="5">5th of every month</option>
+          <option value="10">10th of every month</option>
+          <option value="15" selected>15th of every month</option>
+          <option value="20">20th of every month</option>
+          <option value="25">25th of every month</option>
+        </select>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex space-x-4">
+        <button onclick="window.history.back()" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+          Back
+        </button>
+        <button onclick="startSIP()" class="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
+          Start SIP
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fundCollections = {
+      popular: [
+        { name: 'SBI Bluechip Fund', returns: '+12.5%', category: 'Large Cap • Low Risk' },
+        { name: 'HDFC Mid-Cap Opportunities', returns: '+15.8%', category: 'Mid Cap • Moderate Risk' },
+        { name: 'Axis Small Cap Fund', returns: '+18.2%', category: 'Small Cap • High Risk' },
+        { name: 'Kotak Emerging Equity Fund', returns: '+16.7%', category: 'Multi Cap • Moderate Risk' }
+      ],
+      tax: [
+        { name: 'ICICI Prudential ELSS Tax Saver', returns: '+14.3%', category: 'Tax Saver • 3 Year Lock-in' },
+        { name: 'Axis Long Term Equity Fund', returns: '+13.9%', category: 'Tax Saver • 3 Year Lock-in' },
+        { name: 'DSP Tax Saver Fund', returns: '+15.1%', category: 'Tax Saver • 3 Year Lock-in' },
+        { name: 'Mirae Asset Tax Saver Fund', returns: '+16.2%', category: 'Tax Saver • 3 Year Lock-in' }
+      ]
+    };
+
+    function showCollection(type) {
+      // Update button styles
+      document.getElementById('popularBtn').className = type === 'popular' ? 
+        'p-4 border-2 border-green-500 bg-green-50 text-green-700 rounded-lg font-medium' :
+        'p-4 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:border-green-500';
+      
+      document.getElementById('taxBtn').className = type === 'tax' ? 
+        'p-4 border-2 border-green-500 bg-green-50 text-green-700 rounded-lg font-medium' :
+        'p-4 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:border-green-500';
+
+      // Populate funds
+      const fundsList = document.getElementById('fundsList');
+      fundsList.innerHTML = '';
+      
+      fundCollections[type].forEach(fund => {
+        const fundHTML = `
+          <label class="flex items-center p-4 border rounded-lg hover:border-green-500 cursor-pointer">
+            <input type="radio" name="fund" value="${fund.name}" class="text-green-600">
+            <div class="ml-3 flex-1">
+              <div class="flex justify-between items-center">
+                <h4 class="font-medium text-gray-900">${fund.name}</h4>
+                <span class="text-green-600 font-medium">${fund.returns}</span>
+              </div>
+              <p class="text-sm text-gray-600">${fund.category}</p>
+            </div>
+          </label>
+        `;
+        fundsList.innerHTML += fundHTML;
+      });
+    }
+
+    function setAmount(amount) {
+      document.getElementById('sipAmount').value = amount;
+    }
+
+    function startSIP() {
+      const selectedFund = document.querySelector('input[name="fund"]:checked');
+      const amount = document.getElementById('sipAmount').value;
+      const date = document.getElementById('sipDate').value;
+
+      if (!selectedFund) {
+        alert('Please select a mutual fund');
+        return;
+      }
+
+      if (!amount || amount < 50) {
+        alert('Please enter minimum amount of $50');
+        return;
+      }
+
+      localStorage.setItem('investmentData', JSON.stringify({
+        type: 'SIP',
+        fund: selectedFund.value,
+        amount: parseInt(amount),
+        date: parseInt(date)
+      }));
+
+      window.location.href = 'payment.html';
+    }
+
+    // Initialize with popular funds
+    showCollection('popular');
+  </script>
+</body>
+</html>

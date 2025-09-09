@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SIP Calculator - DebtManage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm border-b sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-8">
+          <a href="index.html" class="text-2xl font-bold text-green-600">DebtManage</a>
+          <div class="hidden md:flex space-x-6">
+            <a href="dashboard.html" class="text-gray-600 hover:text-green-600">Dashboard</a>
+            <a href="funds.html" class="text-gray-600 hover:text-green-600">Explore Funds</a>
+            <a href="sip-calculator.html" class="text-green-600 font-medium">SIP Calculator</a>
+            <a href="transactions.html" class="text-gray-600 hover:text-green-600">Transactions</a>
+            <a href="education.html" class="text-gray-600 hover:text-green-600">Learn</a>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors">
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">SIP Calculator</h1>
+      <p class="text-gray-600">Calculate your SIP returns and plan your investments</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+      <!-- Calculator Form -->
+      <div class="bg-white rounded-xl shadow-sm border p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Calculate Your SIP</h2>
+        
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Monthly Investment Amount</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+              <input type="number" id="monthlyAmount" value="5000" min="500" step="500" 
+                     class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                     oninput="calculateSIP()">
+            </div>
+            <div class="mt-2">
+              <input type="range" id="amountSlider" min="500" max="50000" value="5000" step="500" 
+                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                     oninput="updateAmount(this.value)">
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>₹500</span>
+                <span>₹50,000</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Investment Duration (Years)</label>
+            <input type="number" id="duration" value="10" min="1" max="30" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                   oninput="calculateSIP()">
+            <div class="mt-2">
+              <input type="range" id="durationSlider" min="1" max="30" value="10" 
+                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                     oninput="updateDuration(this.value)">
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>1 Year</span>
+                <span>30 Years</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Expected Annual Return (%)</label>
+            <input type="number" id="expectedReturn" value="12" min="1" max="30" step="0.5" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                   oninput="calculateSIP()">
+            <div class="mt-2">
+              <input type="range" id="returnSlider" min="1" max="30" value="12" step="0.5" 
+                     class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                     oninput="updateReturn(this.value)">
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>1%</span>
+                <span>30%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <h3 class="font-medium text-gray-900 mb-3">Quick Presets</h3>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setPreset(1000, 5, 10)" class="p-2 text-sm bg-white border rounded hover:bg-gray-50">
+                Conservative<br>₹1K, 5Y, 10%
+              </button>
+              <button onclick="setPreset(5000, 10, 12)" class="p-2 text-sm bg-white border rounded hover:bg-gray-50">
+                Moderate<br>₹5K, 10Y, 12%
+              </button>
+              <button onclick="setPreset(10000, 15, 15)" class="p-2 text-sm bg-white border rounded hover:bg-gray-50">
+                Aggressive<br>₹10K, 15Y, 15%
+              </button>
+              <button onclick="setPreset(25000, 20, 18)" class="p-2 text-sm bg-white border rounded hover:bg-gray-50">
+                High Growth<br>₹25K, 20Y, 18%
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="space-y-6">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
+            <p class="text-sm text-gray-600 mb-1">Total Investment</p>
+            <p id="totalInvestment" class="text-2xl font-bold text-blue-600">₹6,00,000</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
+            <p class="text-sm text-gray-600 mb-1">Expected Returns</p>
+            <p id="expectedReturns" class="text-2xl font-bold text-green-600">₹5,05,000</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm border p-6 text-center">
+            <p class="text-sm text-gray-600 mb-1">Maturity Value</p>
+            <p id="maturityValue" class="text-2xl font-bold text-purple-600">₹11,05,000</p>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Investment Growth</h3>
+          <canvas id="sipChart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Detailed Breakdown -->
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Year-wise Breakdown</h3>
+          <div id="yearlyBreakdown" class="space-y-2 max-h-64 overflow-y-auto">
+            <!-- Yearly data will be populated here -->
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-xl shadow-sm border p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Ready to Start?</h3>
+          <div class="space-y-3">
+            <button onclick="startSIPWithCalculation()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors font-medium">
+              Start SIP with These Settings
+            </button>
+            <button onclick="exploreFunds()" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+              Explore Suitable Funds
+            </button>
+            <button onclick="saveCalculation()" class="w-full bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium">
+              Save This Calculation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let chart;
+
+    function updateAmount(value) {
+      document.getElementById('monthlyAmount').value = value;
+      calculateSIP();
+    }
+
+    function updateDuration(value) {
+      document.getElementById('duration').value = value;
+      calculateSIP();
+    }
+
+    function updateReturn(value) {
+      document.getElementById('expectedReturn').value = value;
+      calculateSIP();
+    }
+
+    function setPreset(amount, duration, returnRate) {
+      document.getElementById('monthlyAmount').value = amount;
+      document.getElementById('amountSlider').value = amount;
+      document.getElementById('duration').value = duration;
+      document.getElementById('durationSlider').value = duration;
+      document.getElementById('expectedReturn').value = returnRate;
+      document.getElementById('returnSlider').value = returnRate;
+      calculateSIP();
+    }
+
+    function calculateSIP() {
+      const monthlyAmount = parseFloat(document.getElementById('monthlyAmount').value) || 0;
+      const duration = parseFloat(document.getElementById('duration').value) || 0;
+      const annualReturn = parseFloat(document.getElementById('expectedReturn').value) || 0;
+
+      const monthlyReturn = annualReturn / 12 / 100;
+      const totalMonths = duration * 12;
+      const totalInvestment = monthlyAmount * totalMonths;
+
+      // SIP Maturity Value Formula: M = P × ({[1 + i]^n - 1} / i) × (1 + i)
+      const maturityValue = monthlyAmount * (((Math.pow(1 + monthlyReturn, totalMonths) - 1) / monthlyReturn) * (1 + monthlyReturn));
+      const expectedReturns = maturityValue - totalInvestment;
+
+      // Update display
+      document.getElementById('totalInvestment').textContent = `₹${totalInvestment.toLocaleString('en-IN')}`;
+      document.getElementById('expectedReturns').textContent = `₹${expectedReturns.toLocaleString('en-IN')}`;
+      document.getElementById('maturityValue').textContent = `₹${maturityValue.toLocaleString('en-IN')}`;
+
+      // Update yearly breakdown
+      updateYearlyBreakdown(monthlyAmount, duration, annualReturn);
+      
+      // Update chart
+      updateChart(monthlyAmount, duration, annualReturn);
+    }
+
+    function updateYearlyBreakdown(monthlyAmount, duration, annualReturn) {
+      const breakdown = document.getElementById('yearlyBreakdown');
+      breakdown.innerHTML = '';
+
+      const monthlyReturn = annualReturn / 12 / 100;
+      let cumulativeInvestment = 0;
+      let cumulativeValue = 0;
+
+      for (let year = 1; year <= duration; year++) {
+        const monthsCompleted = year * 12;
+        cumulativeInvestment = monthlyAmount * monthsCompleted;
+        cumulativeValue = monthlyAmount * (((Math.pow(1 + monthlyReturn, monthsCompleted) - 1) / monthlyReturn) * (1 + monthlyReturn));
+        const returns = cumulativeValue - cumulativeInvestment;
+
+        const yearDiv = document.createElement('div');
+        yearDiv.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+        yearDiv.innerHTML = `
+          <span class="font-medium">Year ${year}</span>
+          <div class="text-right text-sm">
+            <div>Investment: ₹${cumulativeInvestment.toLocaleString('en-IN')}</div>
+            <div class="text-green-600">Value: ₹${cumulativeValue.toLocaleString('en-IN')}</div>
+          </div>
+        `;
+        breakdown.appendChild(yearDiv);
+      }
+    }
+
+    function updateChart(monthlyAmount, duration, annualReturn) {
+      const ctx = document.getElementById('sipChart').getContext('2d');
+      
+      if (chart) {
+        chart.destroy();
+      }
+
+      const labels = [];
+      const investmentData = [];
+      const valueData = [];
+      
+      const monthlyReturn = annualReturn / 12 / 100;
+
+      for (let year = 1; year <= duration; year++) {
+        labels.push(`Year ${year}`);
+        const monthsCompleted = year * 12;
+        const investment = monthlyAmount * monthsCompleted;
+        const value = monthlyAmount * (((Math.pow(1 + monthlyReturn, monthsCompleted) - 1) / monthlyReturn) * (1 + monthlyReturn));
+        
+        investmentData.push(investment);
+        valueData.push(value);
+      }
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Total Investment',
+            data: investmentData,
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4
+          }, {
+            label: 'Maturity Value',
+            data: valueData,
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '₹' + value.toLocaleString('en-IN');
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function startSIPWithCalculation() {
+      const amount = document.getElementById('monthlyAmount').value;
+      alert(`Starting SIP with ₹${amount} monthly investment...`);
+      window.location.href = 'funds.html';
+    }
+
+    function exploreFunds() {
+      window.location.href = 'funds.html';
+    }
+
+    function saveCalculation() {
+      const calculation = {
+        monthlyAmount: document.getElementById('monthlyAmount').value,
+        duration: document.getElementById('duration').value,
+        expectedReturn: document.getElementById('expectedReturn').value,
+        timestamp: new Date().toISOString()
+      };
+      
+      localStorage.setItem('savedSIPCalculation', JSON.stringify(calculation));
+      alert('Calculation saved successfully!');
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    // Initialize
+    calculateSIP();
+  </script>
+</body>
+</html>
