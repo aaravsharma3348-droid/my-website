@@ -8,7 +8,7 @@ const API_CONFIG = {
   
   // Production environment
   production: {
-    baseURL: 'https://your-domain.com', // Replace with your production URL
+    baseURL: 'https://debtmanage.space', // Replace with your production URL
     timeout: 15000
   },
   
