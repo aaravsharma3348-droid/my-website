@@ -18,6 +18,7 @@
             <a href="funds.html" class="text-gray-600 hover:text-green-600">Explore Funds</a>
             <a href="sip-calculator.html" class="text-gray-600 hover:text-green-600">SIP Calculator</a>
             <a href="transactions.html" class="text-gray-600 hover:text-green-600">Transactions</a>
+            <a href="withdrawal.html" class="text-gray-600 hover:text-red-600">Withdraw</a>
             <a href="education.html" class="text-gray-600 hover:text-green-600">Learn</a>
           </div>
         </div>
@@ -66,6 +67,7 @@
           <a href="funds.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">Explore Funds</a>
           <a href="sip-calculator.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">SIP Calculator</a>
           <a href="transactions.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">Transactions</a>
+          <a href="withdrawal.html" class="block px-3 py-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-md">Withdraw</a>
           <a href="education.html" class="block px-3 py-2 text-gray-600 hover:text-green-600 hover:bg-gray-50 rounded-md">Learn</a>
           <button onclick="logout()" class="w-full text-left px-3 py-2 text-red-600 hover:bg-red-50 rounded-md">
             Logout
@@ -656,13 +658,17 @@
         }
         
         if (token) {
-          const result = await API.get('/user-profile');
+          const response = await fetch('https://debtmanage-backend.onrender.com/user-profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const result = await response.json();
           if (result.success) {
             document.getElementById('userName').textContent = result.user.name;
           }
         }
       } catch (error) {
         console.log('Could not load user data');
+        document.getElementById('userName').textContent = 'User';
       }
     }
     

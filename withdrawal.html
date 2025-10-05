@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Withdraw Funds - DebtManage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="api-config.js"></script>
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <a href="dashboard.html" class="text-2xl font-bold text-green-600">DebtManage</a>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-600">Welcome, <span id="userName">User</span></span>
+          <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-2xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">Withdraw Funds</h1>
+      <p class="text-gray-600">Withdraw your investment returns to your bank account</p>
+    </div>
+
+    <!-- Withdrawal Form -->
+    <div class="bg-white rounded-xl shadow-sm border p-6">
+      <div class="space-y-6">
+        <!-- Available Balance -->
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div class="flex justify-between items-center">
+            <span class="text-green-800 font-medium">Available Balance:</span>
+            <span class="text-2xl font-bold text-green-600" id="availableBalance">$0</span>
+          </div>
+        </div>
+
+        <!-- Withdrawal Method -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-3">Withdrawal Method</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border-2 border-blue-200 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-colors" onclick="selectMethod('bank')">
+              <div class="flex items-center space-x-3">
+                <input type="radio" name="method" value="bank" id="bankMethod" class="text-blue-600">
+                <div>
+                  <h3 class="font-semibold text-gray-900">🏦 Bank Transfer</h3>
+                  <p class="text-sm text-gray-600">Direct to your bank account</p>
+                  <p class="text-xs text-green-600">Processing: 1-2 business days</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="border-2 border-purple-200 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-colors" onclick="selectMethod('crypto')">
+              <div class="flex items-center space-x-3">
+                <input type="radio" name="method" value="crypto" id="cryptoMethod" class="text-purple-600">
+                <div>
+                  <h3 class="font-semibold text-gray-900">₿ Crypto Wallet</h3>
+                  <p class="text-sm text-gray-600">USDT/BTC withdrawal</p>
+                  <p class="text-xs text-green-600">Processing: Instant</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Withdrawal Amount -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Withdrawal Amount</label>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+            <input type="number" id="withdrawAmount" placeholder="0.00" min="10" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div class="flex justify-between mt-2">
+            <p class="text-sm text-gray-500">Minimum: $10</p>
+            <button onclick="setMaxAmount()" class="text-sm text-blue-600 hover:text-blue-700">Use Max</button>
+          </div>
+        </div>
+
+        <!-- Bank Details (shown when bank method selected) -->
+        <div id="bankDetails" class="hidden space-y-4">
+          <h3 class="font-semibold text-gray-900">Bank Account Details</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="text" id="accountNumber" placeholder="Account Number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <input type="text" id="routingNumber" placeholder="Routing Number" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          </div>
+          <input type="text" id="bankName" placeholder="Bank Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="accountHolder" placeholder="Account Holder Name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <!-- Crypto Details (shown when crypto method selected) -->
+        <div id="cryptoDetails" class="hidden space-y-4">
+          <h3 class="font-semibold text-gray-900">Crypto Wallet Details</h3>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Select Network</label>
+            <select id="cryptoNetwork" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+              <option value="">Select Network</option>
+              <option value="bep20">BEP20 (BSC)</option>
+              <option value="trc20">TRC20 (TRON)</option>
+              <option value="erc20">ERC20 (Ethereum)</option>
+            </select>
+          </div>
+          <input type="text" id="walletAddress" placeholder="Wallet Address" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Fees Information -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h4 class="font-medium text-yellow-800 mb-2">Withdrawal Fees</h4>
+          <div class="text-sm text-yellow-700 space-y-1">
+            <p>🏦 Bank Transfer: $2.50 per transaction</p>
+            <p>₿ Crypto Withdrawal: 1% of amount (min $1)</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button id="withdrawBtn" onclick="processWithdrawal()" class="w-full bg-red-600 text-white py-4 rounded-lg hover:bg-red-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+          <span id="withdrawBtnText">Request Withdrawal</span>
+          <div id="withdrawSpinner" class="hidden inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Withdrawals -->
+    <div class="bg-white rounded-xl shadow-sm border p-6 mt-8">
+      <h3 class="text-xl font-semibold text-gray-900 mb-4">Recent Withdrawals</h3>
+      <div id="recentWithdrawals" class="space-y-3">
+        <div class="text-center py-8 text-gray-500">
+          <p>No recent withdrawals</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedMethod = '';
+    let availableBalance = 0;
+
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'index.html';
+      }
+    }
+
+    async function loadUserData() {
+      try {
+        const token = localStorage.getItem('token');
+        const demoMode = localStorage.getItem('demoMode');
+        
+        if (demoMode === 'true') {
+          document.getElementById('userName').textContent = 'Demo User';
+          availableBalance = 15750; // Demo balance
+          document.getElementById('availableBalance').textContent = `$${availableBalance.toLocaleString()}`;
+          return;
+        }
+        
+        // Load real user data
+        const userResponse = await fetch('https://my-website-backend-t73k.onrender.com/user-profile', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const userData = await userResponse.json();
+        
+        if (userData.success) {
+          document.getElementById('userName').textContent = userData.user.name;
+        }
+        
+        // Load portfolio balance
+        const portfolioResponse = await fetch('https://my-website-backend-t73k.onrender.com/portfolio', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const portfolioData = await portfolioResponse.json();
+        
+        if (portfolioData.success && portfolioData.portfolio.length > 0) {
+          availableBalance = portfolioData.portfolio.reduce((total, fund) => total + fund.currentValue, 0);
+        }
+        
+        document.getElementById('availableBalance').textContent = `$${availableBalance.toLocaleString()}`;
+        
+      } catch (error) {
+        console.error('Error loading user data:', error);
+        document.getElementById('userName').textContent = 'User';
+        document.getElementById('availableBalance').textContent = '$0';
+      }
+    }
+
+    function selectMethod(method) {
+      selectedMethod = method;
+      
+      // Update radio buttons
+      document.getElementById('bankMethod').checked = method === 'bank';
+      document.getElementById('cryptoMethod').checked = method === 'crypto';
+      
+      // Show/hide relevant sections
+      document.getElementById('bankDetails').classList.toggle('hidden', method !== 'bank');
+      document.getElementById('cryptoDetails').classList.toggle('hidden', method !== 'crypto');
+      
+      // Update border colors
+      document.querySelectorAll('[onclick*="selectMethod"]').forEach(el => {
+        el.classList.remove('border-blue-500', 'border-purple-500');
+        el.classList.add(method === 'bank' ? 'border-blue-200' : 'border-purple-200');
+      });
+      
+      if (method === 'bank') {
+        document.querySelector('[onclick="selectMethod(\'bank\')"]').classList.add('border-blue-500');
+      } else {
+        document.querySelector('[onclick="selectMethod(\'crypto\')"]').classList.add('border-purple-500');
+      }
+    }
+
+    function setMaxAmount() {
+      document.getElementById('withdrawAmount').value = availableBalance;
+    }
+
+    async function processWithdrawal() {
+      const amount = parseFloat(document.getElementById('withdrawAmount').value);
+      const withdrawBtn = document.getElementById('withdrawBtn');
+      const withdrawBtnText = document.getElementById('withdrawBtnText');
+      const withdrawSpinner = document.getElementById('withdrawSpinner');
+
+      // Validation
+      if (!selectedMethod) {
+        alert('Please select a withdrawal method');
+        return;
+      }
+
+      if (!amount || amount < 10) {
+        alert('Minimum withdrawal amount is $10');
+        return;
+      }
+
+      if (amount > availableBalance) {
+        alert('Insufficient balance');
+        return;
+      }
+
+      // Method-specific validation
+      if (selectedMethod === 'bank') {
+        const accountNumber = document.getElementById('accountNumber').value;
+        const routingNumber = document.getElementById('routingNumber').value;
+        const bankName = document.getElementById('bankName').value;
+        const accountHolder = document.getElementById('accountHolder').value;
+
+        if (!accountNumber || !routingNumber || !bankName || !accountHolder) {
+          alert('Please fill in all bank details');
+          return;
+        }
+      } else if (selectedMethod === 'crypto') {
+        const network = document.getElementById('cryptoNetwork').value;
+        const walletAddress = document.getElementById('walletAddress').value;
+
+        if (!network || !walletAddress) {
+          alert('Please fill in all crypto details');
+          return;
+        }
+      }
+
+      // Show loading state
+      withdrawBtn.disabled = true;
+      withdrawBtnText.textContent = 'Processing...';
+      withdrawSpinner.classList.remove('hidden');
+
+      try {
+        const token = localStorage.getItem('token');
+        const withdrawalData = {
+          amount: amount,
+          method: selectedMethod,
+          ...(selectedMethod === 'bank' ? {
+            accountNumber: document.getElementById('accountNumber').value,
+            routingNumber: document.getElementById('routingNumber').value,
+            bankName: document.getElementById('bankName').value,
+            accountHolder: document.getElementById('accountHolder').value
+          } : {
+            network: document.getElementById('cryptoNetwork').value,
+            walletAddress: document.getElementById('walletAddress').value
+          })
+        };
+
+        const response = await fetch('https://my-website-backend-t73k.onrender.com/withdraw-funds', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(withdrawalData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert(`Withdrawal request of $${amount.toLocaleString()} submitted successfully! Processing time: ${selectedMethod === 'bank' ? '1-2 business days' : 'Instant'}`);
+          
+          // Reset form
+          document.getElementById('withdrawAmount').value = '';
+          selectedMethod = '';
+          document.getElementById('bankDetails').classList.add('hidden');
+          document.getElementById('cryptoDetails').classList.add('hidden');
+          document.querySelectorAll('input[name="method"]').forEach(input => input.checked = false);
+          
+          // Reload balance
+          loadUserData();
+        } else {
+          alert(result.message || 'Withdrawal request failed');
+        }
+
+      } catch (error) {
+        console.error('Withdrawal error:', error);
+        alert('Connection error. Please try again.');
+      } finally {
+        // Reset button state
+        withdrawBtn.disabled = false;
+        withdrawBtnText.textContent = 'Request Withdrawal';
+        withdrawSpinner.classList.add('hidden');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+
+    async function loadRecentWithdrawals() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('https://my-website-backend-t73k.onrender.com/withdrawals', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        const withdrawalsDiv = document.getElementById('recentWithdrawals');
+        
+        if (data.success && data.withdrawals.length > 0) {
+          withdrawalsDiv.innerHTML = data.withdrawals.map(withdrawal => `
+            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p class="font-medium text-gray-900">$${withdrawal.amount.toLocaleString()}</p>
+                <p class="text-sm text-gray-600">${withdrawal.method} • ${new Date(withdrawal.createdAt).toLocaleDateString()}</p>
+              </div>
+              <span class="px-2 py-1 text-xs rounded-full ${
+                withdrawal.status === 'completed' ? 'bg-green-100 text-green-800' :
+                withdrawal.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                'bg-red-100 text-red-800'
+              }">
+                ${withdrawal.status}
+              </span>
+            </div>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Error loading withdrawals:', error);
+      }
+    }
+
+    // Initialize
+    checkAuth();
+    loadUserData();
+    loadRecentWithdrawals();
+  </script>
+</body>
+</html>
