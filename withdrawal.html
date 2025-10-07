@@ -37,6 +37,20 @@
           </div>
         </div>
 
+        <!-- Lock Period Warning -->
+        <div id="lockPeriodWarning" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 hidden">
+          <div class="flex items-start space-x-3">
+            <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+              <h4 class="font-medium text-yellow-800">Investment Lock Period Active</h4>
+              <p class="text-sm text-yellow-700 mt-1">Your funds are locked until <span id="unlockDate" class="font-semibold"></span>. Early withdrawal may incur penalties.</p>
+              <p class="text-xs text-yellow-600 mt-2">Time remaining: <span id="timeRemaining" class="font-mono"></span></p>
+            </div>
+          </div>
+        </div>
+
         <!-- Withdrawal Method -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-3">Withdrawal Method</label>
@@ -118,6 +132,11 @@
           <span id="withdrawBtnText">Request Withdrawal</span>
           <div id="withdrawSpinner" class="hidden inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></div>
         </button>
+        
+        <!-- Early Withdrawal Button (locked) -->
+        <button id="earlyWithdrawBtn" class="hidden w-full bg-gray-400 text-white py-4 rounded-lg cursor-not-allowed font-semibold" disabled>
+          Early Withdrawal Disabled
+        </button>
       </div>
     </div>
 
@@ -135,12 +154,67 @@
   <script>
     let selectedMethod = '';
     let availableBalance = 0;
+    let lockPeriodEnd = null;
+    let isLocked = false;
 
     function checkAuth() {
       const token = localStorage.getItem('token');
       if (!token) {
         window.location.href = 'index.html';
       }
+    }
+
+    function checkLockPeriod() {
+      // Set lock period end date to December 31, 2025
+      lockPeriodEnd = new Date('2025-12-31T23:59:59');
+      
+      // Store the lock end date
+      localStorage.setItem('lockPeriodEnd', lockPeriodEnd.toISOString());
+      
+      const now = new Date();
+      isLocked = now < lockPeriodEnd;
+      
+      if (isLocked) {
+        showLockPeriodWarning();
+        updateCountdown();
+        setInterval(updateCountdown, 1000); // Update every second
+      }
+    }
+
+    function showLockPeriodWarning() {
+      const warningDiv = document.getElementById('lockPeriodWarning');
+      const unlockDateSpan = document.getElementById('unlockDate');
+      const withdrawBtn = document.getElementById('withdrawBtn');
+      const earlyWithdrawBtn = document.getElementById('earlyWithdrawBtn');
+      
+      warningDiv.classList.remove('hidden');
+      unlockDateSpan.textContent = lockPeriodEnd.toLocaleDateString();
+      
+      // Disable both withdrawal options during lock period
+      withdrawBtn.classList.add('hidden');
+      earlyWithdrawBtn.classList.remove('hidden');
+    }
+
+    function updateCountdown() {
+      const now = new Date();
+      const timeLeft = lockPeriodEnd - now;
+      
+      if (timeLeft <= 0) {
+        // Lock period ended
+        isLocked = false;
+        document.getElementById('lockPeriodWarning').classList.add('hidden');
+        document.getElementById('withdrawBtn').classList.remove('hidden');
+        document.getElementById('earlyWithdrawBtn').classList.add('hidden');
+        return;
+      }
+      
+      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      
+      document.getElementById('timeRemaining').textContent = 
+        `${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
 
     async function loadUserData() {
@@ -219,6 +293,11 @@
       const withdrawSpinner = document.getElementById('withdrawSpinner');
 
       // Validation
+      if (isLocked) {
+        alert('Your funds are still in the lock period. Use early withdrawal option if needed.');
+        return;
+      }
+
       if (!selectedMethod) {
         alert('Please select a withdrawal method');
         return;
@@ -351,10 +430,17 @@
       }
     }
 
+    async function processEarlyWithdrawal() {
+      // Early withdrawal is disabled
+      alert('Early withdrawal is currently disabled. Please wait until the lock period ends.');
+      return;
+    }
+
     // Initialize
     checkAuth();
     loadUserData();
     loadRecentWithdrawals();
+    checkLockPeriod();
   </script>
 </body>
 </html>
