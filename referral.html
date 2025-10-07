@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral Program</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons for UI elements -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Using Inter as the default font */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Simple transition for UI elements */
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl mx-auto">
+        <!-- This view is shown to the existing customer who wants to refer someone -->
+        <div id="referrer-view" class="space-y-8">
+            <header class="text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Give $25, Get $25</h1>
+                <p class="mt-2 text-lg text-slate-600">Invite friends to invest with us. When they make their first investment, you both get a $25 credit!</p>
+            </header>
+
+            <!-- How it Works Section -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-slate-200">
+                <h2 class="text-xl font-semibold text-center text-slate-800 mb-6">How It Works in 5 Easy Steps</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 text-center">
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-3">
+                            <i data-lucide="link" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-slate-700">1. Get Link</h3>
+                        <p class="text-sm text-slate-500">Copy your unique referral link below.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-3">
+                            <i data-lucide="send" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-slate-700">2. Share It</h3>
+                        <p class="text-sm text-slate-500">Send the link to friends via email or social media.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-3">
+                           <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-slate-700">3. Friend Invests</h3>
+                        <p class="text-sm text-slate-500">Your friend signs up and makes their first investment.</p>
+                    </div>
+                    <!-- Step 4 -->
+                     <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-3">
+                            <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-slate-700">4. Track Progress</h3>
+                        <p class="text-sm text-slate-500">See your successful referrals on the dashboard.</p>
+                    </div>
+                    <!-- Step 5 -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-3">
+                            <i data-lucide="gift" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-slate-700">5. You Both Get Paid</h3>
+                        <p class="text-sm text-slate-500">You both get a $25 credit after their first investment.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sharing Section -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-slate-200">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">Your Unique Referral Link</h2>
+                <div class="flex flex-col sm:flex-row items-center gap-3">
+                    <input id="referral-link" type="text" readonly class="w-full px-4 py-3 bg-slate-100 border border-slate-300 rounded-lg text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" value="">
+                    <button id="copy-button" class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all">
+                        <i data-lucide="copy" class="w-5 h-5"></i>
+                        <span id="copy-button-text">Copy</span>
+                    </button>
+                </div>
+                <div class="mt-6">
+                    <p class="text-center sm:text-left text-sm font-medium text-slate-600 mb-3">Or share directly via:</p>
+                    <div class="flex justify-center sm:justify-start items-center gap-4">
+                        <a id="share-email" href="#" class="flex items-center justify-center w-12 h-12 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors" aria-label="Share via Email">
+                            <i data-lucide="mail" class="w-6 h-6 text-slate-600"></i>
+                        </a>
+                        <a id="share-whatsapp" href="#" class="flex items-center justify-center w-12 h-12 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors" aria-label="Share via WhatsApp">
+                            <i data-lucide="message-circle" class="w-6 h-6 text-slate-600"></i>
+                        </a>
+                        <a id="share-twitter" href="#" class="flex items-center justify-center w-12 h-12 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors" aria-label="Share on Twitter">
+                            <i data-lucide="twitter" class="w-6 h-6 text-slate-600"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advocate Dashboard Section -->
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-slate-200">
+                <h2 class="text-xl font-semibold text-slate-800 mb-6">Your Referral Dashboard</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                    <div class="bg-blue-50 p-6 rounded-lg">
+                        <p class="text-3xl font-bold text-blue-600">0</p>
+                        <p class="mt-1 text-sm font-medium text-blue-800">Invites Sent</p>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-lg">
+                        <p class="text-3xl font-bold text-green-600">0</p>
+                        <p class="mt-1 text-sm font-medium text-green-800">Successful Referrals</p>
+                    </div>
+                    <div class="bg-yellow-50 p-6 rounded-lg">
+                        <p class="text-3xl font-bold text-yellow-600">$0</p>
+                        <p class="mt-1 text-sm font-medium text-yellow-800">Total Rewards Earned</p>
+                    </div>
+                </div>
+                <div class="mt-8">
+                     <h3 class="text-lg font-semibold text-gray-700 mb-4">Referral History</h3>
+                     <div class="text-center py-8 text-gray-500">
+                         <p>No referrals yet</p>
+                         <p class="text-sm mt-1">Start sharing your link to earn rewards!</p>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- This view is shown to the friend who clicked the referral link -->
+        <div id="referred-friend-view" class="hidden text-center">
+            <div class="bg-white p-8 md:p-12 rounded-xl shadow-lg border border-slate-200">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i data-lucide="gift" class="w-8 h-8 text-blue-600"></i>
+                    </div>
+                </div>
+                <h1 id="referred-welcome-message" class="text-3xl md:text-4xl font-bold text-slate-900">A $25 gift from your friend!</h1>
+                <p class="mt-3 text-lg text-slate-600">You've been invited to invest with us. Sign up and get a <strong class="font-semibold text-blue-600">$25 bonus</strong> after your first investment.</p>
+                <button class="mt-8 w-full max-w-xs mx-auto bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all text-lg">
+                    Sign Up & Claim Your $25
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // This function simulates generating a unique referral code.
+            // In a real app, this would be generated server-side and associated with a user account.
+            const generateReferralCode = () => {
+                return 'REF' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            };
+
+            const referralCode = generateReferralCode();
+            const baseUrl = window.location.origin + window.location.pathname;
+            const referralLink = `${baseUrl}?ref=${referralCode}`;
+
+            const referralLinkInput = document.getElementById('referral-link');
+            if (referralLinkInput) {
+                referralLinkInput.value = referralLink;
+            }
+
+            // --- URL Parameter Handling ---
+            // Checks if a referral code is in the URL and switches views if necessary.
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCodeFromUrl = urlParams.get('ref');
+
+            const referrerView = document.getElementById('referrer-view');
+            const referredFriendView = document.getElementById('referred-friend-view');
+
+            if (refCodeFromUrl) {
+                // If a referral code exists, show the referred friend's landing page view.
+                if (referrerView) referrerView.classList.add('hidden');
+                if (referredFriendView) referredFriendView.classList.remove('hidden');
+                
+                // You could add logic here to personalize the message further if the referrer's name was also in the URL.
+                // For example: ?ref=CODE123&name=Sarah
+                const referrerName = urlParams.get('name') || 'Your friend';
+                const welcomeMessage = document.getElementById('referred-welcome-message');
+                if(welcomeMessage) {
+                    welcomeMessage.textContent = `A gift from ${referrerName}!`;
+                }
+            } else {
+                // Otherwise, show the default referrer dashboard view.
+                if (referrerView) referrerView.classList.remove('hidden');
+                if (referredFriendView) referredFriendView.classList.add('hidden');
+            }
+
+            // --- Event Listeners ---
+
+            // Copy Button Functionality
+            const copyButton = document.getElementById('copy-button');
+            const copyButtonText = document.getElementById('copy-button-text');
+            if (copyButton) {
+                copyButton.addEventListener('click', () => {
+                    referralLinkInput.select();
+                    // Using document.execCommand for broader compatibility within iFrames.
+                    try {
+                        document.execCommand('copy');
+                        copyButtonText.textContent = 'Copied!';
+                        copyButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                        copyButton.classList.add('bg-green-500');
+
+                        setTimeout(() => {
+                            copyButtonText.textContent = 'Copy';
+                            copyButton.classList.remove('bg-green-500');
+                            copyButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                        copyButtonText.textContent = 'Error!';
+                         setTimeout(() => {
+                            copyButtonText.textContent = 'Copy';
+                        }, 2000);
+                    }
+                });
+            }
+
+            // Social Sharing Links
+            const shareEmail = document.getElementById('share-email');
+            const shareWhatsapp = document.getElementById('share-whatsapp');
+            const shareTwitter = document.getElementById('share-twitter');
+
+            const shareMessage = `Hey! I'm using this investing app and thought you'd like it. If you sign up with my link and make your first investment, we both get a $25 bonus! Here's the link: ${referralLink}`;
+            
+            if (shareEmail) {
+                shareEmail.href = `mailto:?subject=Check out this awesome service!&body=${encodeURIComponent(shareMessage)}`;
+            }
+            if (shareWhatsapp) {
+                shareWhatsapp.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+                shareWhatsapp.target = '_blank';
+            }
+            if (shareTwitter) {
+                const twitterText = `Check out this awesome service! We both get a reward when you sign up.`;
+                shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(referralLink)}`;
+                shareTwitter.target = '_blank';
+            }
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        });
+        
+        async function loadReferralStats() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('https://my-website-backend-t73k.onrender.com/referral-stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update dashboard stats
+                    document.querySelector('.text-blue-600').textContent = data.stats.totalReferrals;
+                    document.querySelector('.text-green-600').textContent = data.stats.totalReferrals;
+                    document.querySelector('.text-yellow-600').textContent = `$${data.stats.totalRewards}`;
+                    
+                    // Update referral history
+                    const historyDiv = document.querySelector('.mt-8 > div');
+                    if (data.stats.referrals.length > 0) {
+                        historyDiv.innerHTML = `
+                            <ul class="space-y-3">
+                                ${data.stats.referrals.map(ref => `
+                                    <li class="flex justify-between items-center bg-gray-50 p-3 rounded-md">
+                                        <span class="text-gray-600">${ref.email}</span>
+                                        <span class="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded-full">${ref.status}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        `;
+                    }
+                    
+                    // Update referral link with real code
+                    if (data.stats.referralCode) {
+                        const baseUrl = window.location.origin + '/index.html';
+                        const referralLink = `${baseUrl}?ref=${data.stats.referralCode}`;
+                        document.getElementById('referral-link').value = referralLink;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading referral stats:', error);
+            }
+        }
+
+        async function generateReferralCode() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('https://my-website-backend-t73k.onrender.com/generate-referral', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const baseUrl = window.location.origin + '/index.html';
+                    const referralLink = `${baseUrl}?ref=${data.referralCode}`;
+                    document.getElementById('referral-link').value = referralLink;
+                }
+            } catch (error) {
+                console.error('Error generating referral code:', error);
+            }
+        }
+
+        // Initialize real-time referrals
+        checkAuth();
+        loadUserData();
+        generateReferralCode();
+        loadReferralStats();
+    </script>
+</body>
+</html>
+
+
+

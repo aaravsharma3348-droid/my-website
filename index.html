@@ -95,7 +95,12 @@
       </div>
       <div class="space-y-6">
         <div class="relative">
-          <input type="email" id="loginEmail" placeholder="Email Address" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+          <input type="email" id="loginEmail" placeholder="Email Address" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white peer" required>
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+            <svg class="w-5 h-5 text-gray-400 peer-focus:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+            </svg>
+          </div>
         </div>
         <div class="relative">
           <input type="password" id="loginPassword" placeholder="Password" class="w-full p-4 pr-12 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200 bg-gray-50 focus:bg-white">
@@ -105,10 +110,18 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
             </svg>
           </button>
-          <div id="loginError" class="text-red-500 text-sm mt-1 hidden">Invalid email or password</div>
+          <div id="loginError" class="text-red-500 text-sm mt-1 hidden p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-center">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              <span id="loginErrorText">Invalid email or password</span>
+            </div>
+          </div>
         </div>
-        <button onclick="login()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-          Sign In
+        <button id="loginBtn" onclick="login()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span id="loginBtnText">Sign In</span>
+          <div id="loginSpinner" class="hidden inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></div>
         </button>
       </div>
       <div class="mt-8 text-center">
@@ -139,8 +152,9 @@
         <input type="email" id="signupEmail" placeholder="Email Address" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white">
         <input type="tel" id="signupMobile" placeholder="Mobile Number" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white">
         <input type="password" id="signupPassword" placeholder="Password" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 bg-gray-50 focus:bg-white">
-        <button onclick="signup()" class="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white p-4 rounded-xl hover:from-green-700 hover:to-blue-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-          Create Account
+        <button id="signupBtn" onclick="signup()" class="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white p-4 rounded-xl hover:from-green-700 hover:to-blue-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
+          <span id="signupBtnText">Create Account</span>
+          <div id="signupSpinner" class="hidden inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2"></div>
         </button>
       </div>
       <div class="mt-8 text-center">
@@ -223,6 +237,35 @@
       closeSignup();
       setTimeout(() => openLogin(), 300);
     }
+    
+    function showSuccessMessage(message) {
+      // Create success notification
+      const successDiv = document.createElement('div');
+      successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+      successDiv.innerHTML = `
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+          </svg>
+          ${message}
+        </div>
+      `;
+      
+      document.body.appendChild(successDiv);
+      
+      // Animate in
+      setTimeout(() => {
+        successDiv.classList.remove('translate-x-full');
+      }, 100);
+      
+      // Remove after 3 seconds
+      setTimeout(() => {
+        successDiv.classList.add('translate-x-full');
+        setTimeout(() => {
+          document.body.removeChild(successDiv);
+        }, 300);
+      }, 3000);
+    }
 
     function toggleLoginPassword() {
       const passwordInput = document.getElementById('loginPassword');
@@ -241,22 +284,37 @@
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       const errorDiv = document.getElementById('loginError');
+      const errorText = document.getElementById('loginErrorText');
+      const loginBtn = document.getElementById('loginBtn');
+      const loginBtnText = document.getElementById('loginBtnText');
+      const loginSpinner = document.getElementById('loginSpinner');
+      
+      // Hide previous errors
+      errorDiv.classList.add('hidden');
       
       if (!email || !password) {
-        errorDiv.textContent = 'Please fill in all fields';
+        errorText.textContent = 'Please fill in all fields';
         errorDiv.classList.remove('hidden');
         return;
       }
+      
+      // Show loading state
+      loginBtn.disabled = true;
+      loginBtnText.textContent = 'Signing In...';
+      loginSpinner.classList.remove('hidden');
       
       // Check for demo account
       if (email === 'demo@debtmanage.com' && password === 'demo123') {
         localStorage.setItem('token', 'demo-token');
         localStorage.setItem('demoMode', 'true');
         localStorage.setItem('userName', 'Demo User');
-        errorDiv.classList.add('hidden');
-        alert('Welcome to the demo! Explore all features.');
-        window.location.href = 'dashboard.html';
-        closeLogin();
+        
+        // Show success message
+        showSuccessMessage('Welcome to the demo! Redirecting...');
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1500);
         return;
       }
       
@@ -266,17 +324,24 @@
         if (result.success) {
           localStorage.setItem('token', result.token);
           localStorage.removeItem('demoMode');
-          errorDiv.classList.add('hidden');
-          alert('Login successful!');
-          window.location.href = 'dashboard.html';
-          closeLogin();
+          
+          showSuccessMessage('Login successful! Redirecting...');
+          
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1500);
         } else {
-          errorDiv.textContent = result.message || 'Invalid email or password';
+          errorText.textContent = result.message || 'Invalid email or password';
           errorDiv.classList.remove('hidden');
         }
       } catch (error) {
-        errorDiv.textContent = error.message || 'Connection error. Please try again.';
+        errorText.textContent = error.message || 'Connection error. Please try again.';
         errorDiv.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        loginBtn.disabled = false;
+        loginBtnText.textContent = 'Sign In';
+        loginSpinner.classList.add('hidden');
       }
     }
 
@@ -286,7 +351,9 @@
       const mobile = document.getElementById('signupMobile').value.trim();
       const password = document.getElementById('signupPassword').value.trim();
       
-      console.log('Signup values:', { name, email, mobile, password });
+      // Check for referral code in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const referralCode = urlParams.get('ref');
       
       if (!name) {
         alert('Please enter your full name');
@@ -305,15 +372,22 @@
         return;
       }
       
-      console.log('All validations passed, sending request...');
-      
       try {
-        console.log('Sending signup request with data:', { name, email, mobile, password });
-        const result = await API.post('/signup', { name, email, mobile, password });
-        console.log('Signup response:', result);
+        // Use referral signup if code exists
+        const endpoint = referralCode ? '/signup-with-referral' : '/signup';
+        const signupData = { name, email, mobile, password };
+        
+        if (referralCode) {
+          signupData.referralCode = referralCode;
+        }
+        
+        const result = await API.post(endpoint, signupData);
         
         if (result.success) {
-          alert('Account created successfully! Please login.');
+          const message = referralCode ? 
+            'Account created successfully! Referral tracked. Please login.' :
+            'Account created successfully! Please login.';
+          alert(message);
           closeSignup();
           setTimeout(() => openLogin(), 500);
         } else {
